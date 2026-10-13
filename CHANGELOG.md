@@ -22,7 +22,8 @@ The first release, with two finance skills and a delivery for every client.
   rules, paid and forecast kept apart, with a list of gaps.
 - One ZIP per skill and an index `skills.json` on every release, for upload
   to claude.ai and Claude Desktop.
-- A Claude Code marketplace with one plugin per skill and the plugin
-  `benethos-yahoo-finance-mcp` for the market data.
+- A Claude Code marketplace with one plugin per skill, each taken from the
+  release tag, and the plugin `benethos-yahoo-finance-mcp` for the market
+  data.
 - Tests for the layout, the skill headers, links, tables of contents, the text
   rules, the packaging and the workflows.
