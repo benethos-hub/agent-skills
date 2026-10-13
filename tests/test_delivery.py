@@ -55,6 +55,14 @@ class PackTest(unittest.TestCase):
                 self.assertTrue(entry["latest_url"].endswith(f"/releases/latest/download/{entry['name']}.zip"))
                 self.assertTrue((ROOT / entry["path"] / "SKILL.md").is_file())
 
+    def test_entries_are_stored_uncompressed(self):
+        # Deflate output differs between zlib builds, stored entries do not.
+        for name in self.names:
+            with zipfile.ZipFile(self.tmp / f"{name}.zip") as archive:
+                types = {entry.compress_type for entry in archive.infolist()}
+            with self.subTest(skill=name):
+                self.assertEqual(types, {zipfile.ZIP_STORED})
+
     def test_same_content_gives_same_bytes(self):
         again = Path(tempfile.mkdtemp())
         pack(again, "9.9.9")
@@ -84,37 +92,37 @@ class PackRulesTest(unittest.TestCase):
     def test_broken_headers_are_rejected(self):
         root = self.make_repo(
             {
-                "a/good-one/SKILL.md": "---\nname: good-one\ndescription: fine\n---\n",
-                "a/Bad_Name/SKILL.md": "---\nname: Bad_Name\ndescription: x\n---\n",
-                "a/other/SKILL.md": "---\nname: different\ndescription: x\n---\n",
-                "a/no-description/SKILL.md": "---\nname: no-description\n---\n",
-                "a/too-long/SKILL.md": f"---\nname: too-long\ndescription: {'x' * 1025}\n---\n",
-                "a/open-header/SKILL.md": "---\nname: open-header\n",
-                "b/good-one/SKILL.md": "---\nname: good-one\ndescription: twin\n---\n",
+                "skills/a/good-one/SKILL.md": "---\nname: good-one\ndescription: fine\n---\n",
+                "skills/a/Bad_Name/SKILL.md": "---\nname: Bad_Name\ndescription: x\n---\n",
+                "skills/a/other/SKILL.md": "---\nname: different\ndescription: x\n---\n",
+                "skills/a/no-description/SKILL.md": "---\nname: no-description\n---\n",
+                "skills/a/too-long/SKILL.md": f"---\nname: too-long\ndescription: {'x' * 1025}\n---\n",
+                "skills/a/open-header/SKILL.md": "---\nname: open-header\n",
+                "skills/b/good-one/SKILL.md": "---\nname: good-one\ndescription: twin\n---\n",
             }
         )
         report = self.problems(root)
         for expected in (
-            "a/Bad_Name: name 'Bad_Name' must be lower-case",
-            "a/other: name 'different' differs from the folder name",
-            "a/no-description: the header has no description",
-            "a/too-long: description has 1025 characters",
-            "a/open-header: the header of SKILL.md is not closed",
-            "b/good-one: the skill name is already used by a/good-one",
+            "skills/a/Bad_Name: name 'Bad_Name' must be lower-case",
+            "skills/a/other: name 'different' differs from the folder name",
+            "skills/a/no-description: the header has no description",
+            "skills/a/too-long: description has 1025 characters",
+            "skills/a/open-header: the header of SKILL.md is not closed",
+            "skills/b/good-one: the skill name is already used by skills/a/good-one",
         ):
             with self.subTest(expected=expected):
                 self.assertIn(expected, report)
-        self.assertNotIn("a/good-one:", report)
+        self.assertNotIn("skills/a/good-one:", report)
 
     def test_leftovers_stay_out_of_the_zip(self):
         root = self.make_repo(
             {
-                "a/kept/SKILL.md": "---\nname: kept\ndescription: x\n---\n",
-                "a/kept/references/notes.md": "notes",
-                "a/kept/evals/case.yaml": "x",
-                "a/kept/scripts/__pycache__/tool.cpython-312.pyc": "x",
-                "a/kept/scripts/tool.py": "print()",
-                "a/kept/.DS_Store": "x",
+                "skills/a/kept/SKILL.md": "---\nname: kept\ndescription: x\n---\n",
+                "skills/a/kept/references/notes.md": "notes",
+                "skills/a/kept/evals/case.yaml": "x",
+                "skills/a/kept/scripts/__pycache__/tool.cpython-312.pyc": "x",
+                "skills/a/kept/scripts/tool.py": "print()",
+                "skills/a/kept/.DS_Store": "x",
             }
         )
         out = Path(tempfile.mkdtemp())
@@ -174,10 +182,10 @@ class ReadmeTest(unittest.TestCase):
         rows = [line for line in text.splitlines() if line.startswith("| [")]
         listed = {}
         for row in rows:
-            match = re.match(r"\| \[[^\]]+\]\(([^/]+)/README\.md\)", row)
-            self.assertIsNotNone(match, f"the row does not start with a link to <category>/README.md: {row}")
+            match = re.match(r"\| \[[^\]]+\]\(skills/([^/]+)/README\.md\)", row)
+            self.assertIsNotNone(match, f"the row does not start with a link to skills/<category>/README.md: {row}")
             category = match.group(1)
-            listed[category] = sorted(re.findall(rf"\]\({category}/([^/]+)/SKILL\.md\)", row))
+            listed[category] = sorted(re.findall(rf"\]\(skills/{category}/([^/]+)/SKILL\.md\)", row))
         expected = {c.name: sorted(f.name for f in skill_folders(c)) for c in categories()}
         self.assertEqual(listed, expected)
 
@@ -193,7 +201,7 @@ class ReadmeTest(unittest.TestCase):
 
     def test_category_readme_names_its_mcp_plugins(self):
         for plugin in skills.MCP_PLUGINS:
-            text = (ROOT / plugin["category"] / "README.md").read_text(encoding="utf-8")
+            text = (ROOT / "skills" / plugin["category"] / "README.md").read_text(encoding="utf-8")
             with self.subTest(plugin=plugin["name"]):
                 self.assertIn(f"claude plugin install {plugin['name']}@{MARKETPLACE}", text)
 

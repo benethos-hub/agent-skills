@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 import unittest
 
-from support import ROOT, categories, rel, skill_folders, skills
+from support import ROOT, SKILLS, categories, rel, skill_folders, skills
 
 # Fields the Agent Skills specification defines for the header.
 HEADER_FIELDS = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
@@ -30,7 +30,21 @@ class RootTest(unittest.TestCase):
         self.assertRegex(text, r"Copyright \(c\) \d{4} \S")
 
     def test_there_is_a_category(self):
-        self.assertTrue(categories(), "no category folder found")
+        self.assertTrue(categories(), "no category folder found under skills/")
+
+    def test_skills_folder_holds_only_categories(self):
+        loose = sorted(p.name for p in SKILLS.iterdir() if not p.is_dir())
+        self.assertEqual(loose, [], "skills/ holds category folders only")
+
+    def test_every_skill_md_is_under_skills(self):
+        # A SKILL.md anywhere else would be neither packed nor offered.
+        found = sorted(
+            rel(p)
+            for p in ROOT.rglob("SKILL.md")
+            if not any(part.startswith(".") for part in p.relative_to(ROOT).parts)
+        )
+        expected = sorted(rel(f / "SKILL.md") for c in categories() for f in skill_folders(c))
+        self.assertEqual(found, expected, "a SKILL.md belongs in skills/<category>/<skill-name>/")
 
 
 class CategoryTest(unittest.TestCase):

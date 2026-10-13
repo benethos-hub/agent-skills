@@ -46,7 +46,7 @@ Each skill comes as a ZIP of its own from the newest release:
 
 In claude.ai and Claude Desktop, upload the ZIP in the settings under Skills.
 Claude Code needs the marketplace once before the install command, see
-[Installing](../README.md#installing) in the main README. The same section
+[Installing](../../README.md#installing) in the main README. The same section
 covers other agents and updates.
 
 ### 2. Connect a market-data server
@@ -97,7 +97,7 @@ claude plugin install benethos-yahoo-finance-mcp@benethos-agent-skills
 ```
 
 The marketplace has to be added once before, see
-[Installing](../README.md#installing) in the main README. No skill installs the
+[Installing](../../README.md#installing) in the main README. No skill installs the
 server by itself, because the skills work with any provider of the same data.
 
 Without the marketplace, the following command makes the server available in
