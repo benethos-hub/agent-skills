@@ -12,7 +12,10 @@ The newest version below is the one the next release must carry. Every
 ### Added
 
 - The icon next to the title of the README, as `assets/brand/icon.svg` and
-  a 512x512 `icon.png` that `assets/render_icon.py` draws from it.
+  a 512x512 `icon.png` drawn from it.
+- A 1280x640 `assets/brand/social-preview.png`, the image GitHub shows when
+  the repository link is shared. `assets/render_brand.py` draws both PNGs
+  from the SVG.
 - CI runs the brand check of the organisation, which tests both files.
 
 ### Changed

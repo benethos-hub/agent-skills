@@ -49,17 +49,21 @@ class RootTest(unittest.TestCase):
 
 
 class BrandTest(unittest.TestCase):
-    """assets/render_icon.py draws icon.png from icon.svg. Both are committed."""
+    """assets/render_brand.py draws the PNGs from icon.svg. All are committed."""
 
-    def test_icon_files_exist(self):
-        for name in ("icon.svg", "icon.png"):
-            self.assertTrue((ROOT / "assets" / "brand" / name).is_file(), f"assets/brand/{name} is missing")
+    PNGS = {"icon.png": (512, 512), "social-preview.png": (1280, 640)}
 
-    def test_icon_png_is_512_square(self):
-        data = (ROOT / "assets" / "brand" / "icon.png").read_bytes()
-        self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n", "not a PNG")
-        width, height = struct.unpack(">II", data[16:24])
-        self.assertEqual((width, height), (512, 512), "run: uv run assets/render_icon.py")
+    def test_brand_files_exist(self):
+        for name in ("icon.svg", *self.PNGS):
+            with self.subTest(file=name):
+                self.assertTrue((ROOT / "assets" / "brand" / name).is_file(), f"assets/brand/{name} is missing")
+
+    def test_png_sizes(self):
+        for name, size in self.PNGS.items():
+            data = (ROOT / "assets" / "brand" / name).read_bytes()
+            with self.subTest(file=name):
+                self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n", "not a PNG")
+                self.assertEqual(struct.unpack(">II", data[16:24]), size, "run: uv run assets/render_brand.py")
 
 
 class CategoryTest(unittest.TestCase):
