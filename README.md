@@ -1,4 +1,4 @@
-# <img src="assets/brand/logo.svg" alt="" width="40" height="40"> Agent Skills
+# <img src="https://raw.githubusercontent.com/benethos-hub/agent-skills/main/assets/brand/logo.svg" alt="" width="40" height="40"> Agent Skills
 
 Skills for AI agents, written to the open [Agent Skills](https://agentskills.io)
 standard: one folder per skill with a `SKILL.md`, a header with `name` and
