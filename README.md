@@ -24,19 +24,20 @@ The skills are written in English and answer in the language of the user.
 
 ## Categories
 
-The skills are ordered by category. Each category has its own README with its
-skills, what they need and how to set it up.
+The skills live in [skills/](skills/), ordered by category. Each category has
+its own README with its skills, what they need and how to set it up.
 
 | Category | What for | Skills |
 |---|---|---|
-| [finance](finance/README.md) | Securities and portfolios, calculated from current market data | [asset-analysis](finance/asset-analysis/SKILL.md), [dividend-calendar](finance/dividend-calendar/SKILL.md) |
+| [finance](skills/finance/README.md) | Securities and portfolios, calculated from current market data | [asset-analysis](skills/finance/asset-analysis/SKILL.md), [dividend-calendar](skills/finance/dividend-calendar/SKILL.md) |
 
 Some skills only give a useful answer when the agent can reach the right MCP
 server. Read the category's README before installing.
 
 ## Installing
 
-Every skill is a folder in this repository. Each release also carries every
+Every skill is a folder `skills/<category>/<skill-name>/` in this repository.
+Each release also carries every
 skill as a ZIP of its own, and the newest one is always reachable under the
 same link:
 
@@ -44,8 +45,8 @@ same link:
 https://github.com/benethos-hub/agent-skills/releases/latest/download/<skill-name>.zip
 ```
 
-The categories only order this repository. Agents look for a skill's folder
-directly in their skills directory, not inside a category.
+`skills/` and the categories only order this repository. Agents look for a
+skill's folder directly in their skills directory, not inside a category.
 
 ### Claude in the browser and in Claude Desktop
 
@@ -133,7 +134,8 @@ python3 -m unittest discover -s tests -v
 
 They check:
 
-- **Layout.** Every category has a README and holds only skill folders. Every
+- **Layout.** `skills/` holds only categories, and every `SKILL.md` lies in
+  one of them. Every category has a README and holds only skill folders. Every
   skill folder holds only what the standard allows.
 - **Headers.** Name, description and the other fields follow the Agent Skills
   specification. Names are unique in the whole repository.
@@ -145,8 +147,8 @@ They check:
 - **Version.** The changelog is in order, and every `vX.Y.Z` in a Markdown file
   is its newest version.
 - **Delivery.** The ZIPs hold one folder each and leave out test material, the
-  index matches them, and the same content gives the same bytes. The workflows
-  pin every action to a commit.
+  index matches them, and the same content gives the same bytes on every
+  machine. The workflows pin every action to a commit.
 
 External links are only fetched on request, because that needs the network:
 
@@ -168,18 +170,19 @@ agent-skills/
     scripts/skills.py # checks the skills, packs the ZIPs, writes both JSON files
     workflows/        # CI on every push, the release assets on every release
   tests/              # the checks above, standard library only
-  <category>/
-    README.md         # the category's skills, what they need, the setup
-    <skill-name>/
-      SKILL.md        # required: header with name and description, then the instructions
-      references/     # optional: longer reference texts the instructions point to
-      scripts/        # optional: helper scripts
+  skills/
+    <category>/
+      README.md       # the category's skills, what they need, the setup
+      <skill-name>/
+        SKILL.md      # required: header with name and description, then the instructions
+        references/   # optional: longer reference texts the instructions point to
+        scripts/      # optional: helper scripts
 ```
 
 ### Rules for a new skill
 
-- It goes into the category that fits, or into a new one with a short English
-  name in lower case. A new category gets its own README.md and a row in the
+- It goes into the category under `skills/` that fits, or into a new one with
+  a short English name in lower case. A new category gets its own README.md and a row in the
   table above.
 - The folder name equals `name` in the header: lower-case letters, digits and
   single hyphens, at most 64 characters. A name is used only once in the whole

@@ -13,6 +13,18 @@ The newest version below is the one the next release must carry. Every
 
 - The logo next to the title of the README.
 
+### Changed
+
+- The categories moved into `skills/`, so a skill now lies in
+  `skills/<category>/<skill-name>/`. The ZIPs keep their content, they never
+  carried the category. In Claude Code the marketplace on `main` already names
+  the new paths, which v0.1.0 does not have, so installs through it work again
+  with the next release.
+- The ZIPs store their files without compression. Deflate output depends on
+  the zlib build, so the same content gave other bytes and another SHA-256 on
+  another Python version or platform. Stored, it gives the same bytes
+  everywhere.
+
 ## [0.1.0] - 2026-10-13
 
 The first release, with two finance skills and a delivery for every client.

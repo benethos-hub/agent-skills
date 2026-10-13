@@ -1,6 +1,7 @@
 """Check the skills in this repository and build what is delivered from them.
 
-A skill is a folder <category>/<skill-name>/ with a SKILL.md. Two commands:
+A skill is a folder skills/<category>/<skill-name>/ with a SKILL.md. Three
+commands:
 
     python3 .github/scripts/skills.py pack OUT_DIR [--version X.Y.Z]
     python3 .github/scripts/skills.py marketplace [--check]
@@ -80,7 +81,10 @@ EXCLUDED_DIRS = {"evals", "__pycache__", ".pytest_cache", "node_modules"}
 EXCLUDED_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
-# A fixed date for every entry, so the same content gives the same bytes.
+# A fixed date for every entry and no compression, so the same content gives
+# the same bytes on every machine. Deflate output depends on the zlib build,
+# which differs between Python versions and platforms. The files are text and
+# small, so storing them costs little.
 ZIP_DATE = (1980, 1, 1, 0, 0, 0)
 
 
@@ -128,7 +132,7 @@ def read_header(skill_md: Path) -> dict[str, str]:
 
 def load_skills() -> list[Skill]:
     """Read and check every skill. Exit with a list of problems if one fails."""
-    folders = sorted(p.parent for p in ROOT.glob("*/*/SKILL.md"))
+    folders = sorted(p.parent for p in ROOT.glob("skills/*/*/SKILL.md"))
     if not folders:
         sys.exit("No skills found.")
     skills: list[Skill] = []
@@ -184,12 +188,15 @@ def pack_one(skill: Skill, target: Path) -> int:
         (p for p in skill.folder.rglob("*") if p.is_file() and included(p, skill.folder)),
         key=lambda p: p.relative_to(skill.folder).as_posix(),
     )
-    with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
+    with zipfile.ZipFile(target, "w", zipfile.ZIP_STORED) as archive:
         for path in files:
             arcname = f"{skill.name}/{path.relative_to(skill.folder).as_posix()}"
             entry = zipfile.ZipInfo(arcname, date_time=ZIP_DATE)
-            entry.compress_type = zipfile.ZIP_DEFLATED
+            entry.compress_type = zipfile.ZIP_STORED
             entry.external_attr = 0o644 << 16
+            # Python writes the system it runs on, 0 on Windows and 3 on Unix.
+            # Fixed to Unix, so a build on Windows matches the one in CI.
+            entry.create_system = 3
             archive.writestr(entry, path.read_bytes())
     return len(files)
 

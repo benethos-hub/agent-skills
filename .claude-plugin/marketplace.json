@@ -21,7 +21,7 @@
       "license": "MIT",
       "repository": "https://github.com/benethos-hub/agent-skills",
       "skills": [
-        "./finance/asset-analysis"
+        "./skills/finance/asset-analysis"
       ]
     },
     {
@@ -38,7 +38,7 @@
       "license": "MIT",
       "repository": "https://github.com/benethos-hub/agent-skills",
       "skills": [
-        "./finance/dividend-calendar"
+        "./skills/finance/dividend-calendar"
       ]
     },
     {

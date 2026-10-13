@@ -9,9 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-
-# Top-level folders that are not a category.
-NOT_CATEGORIES = {"assets", "tests"}
+SKILLS = ROOT / "skills"
 
 
 def load_skills_module():
@@ -29,11 +27,7 @@ skills = load_skills_module()
 
 
 def categories() -> list[Path]:
-    return sorted(
-        p
-        for p in ROOT.iterdir()
-        if p.is_dir() and not p.name.startswith(".") and p.name not in NOT_CATEGORIES
-    )
+    return sorted(p for p in SKILLS.iterdir() if p.is_dir())
 
 
 def skill_folders(category: Path) -> list[Path]:
