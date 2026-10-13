@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/benethos-hub/agent-skills/main/assets/brand/logo.svg" alt="" width="40" height="40"> Agent Skills
+# <img src="https://raw.githubusercontent.com/benethos-hub/agent-skills/main/assets/brand/icon.svg" alt="" width="40" height="40"> Agent Skills
 
 Skills for AI agents, written to the open [Agent Skills](https://agentskills.io)
 standard: one folder per skill with a `SKILL.md`, a header with `name` and
@@ -163,7 +163,7 @@ agent-skills/
   README.md
   CHANGELOG.md        # the version and what changed
   LICENSE
-  assets/brand/       # the logo
+  assets/brand/       # the icon
   .claude-plugin/
     marketplace.json  # generated, one plugin per skill and per MCP server for Claude Code
   .github/

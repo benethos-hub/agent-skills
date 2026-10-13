@@ -11,7 +11,7 @@ The newest version below is the one the next release must carry. Every
 
 ### Added
 
-- The logo next to the title of the README.
+- The icon next to the title of the README.
 
 ### Changed
 

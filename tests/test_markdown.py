@@ -48,7 +48,7 @@ class LinkTest(unittest.TestCase):
                     self.assertNotRegex(link.target, own, "use a relative link")
 
     def test_raw_links_to_this_repository_name_existing_files(self):
-        # The README shows the logo by its raw URL on main, as PyPI-style
+        # The README shows the icon by its raw URL on main, as PyPI-style
         # renderers need. The file behind it has to exist here too.
         raw = re.compile(r"^https://raw\.githubusercontent\.com/benethos-hub/agent-skills/main/(.+)$")
         for path in markdown_files():
