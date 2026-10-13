@@ -1,0 +1,13 @@
+version: 2
+# The workflows pin every action to a full commit SHA, with the version it
+# stands for in a trailing comment. A tag is a pointer its owner can move, a
+# SHA cannot. Dependabot reads the comment and raises SHA and comment together.
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]

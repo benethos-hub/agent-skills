@@ -1,0 +1,5 @@
+# LF in every checkout, Windows included. The ZIPs, their SHA-256 in
+# skills.json and the check of the marketplace file compare bytes, so a
+# checkout with CRLF would build other archives than CI and fail the tests.
+* text=auto eol=lf
+*.zip binary

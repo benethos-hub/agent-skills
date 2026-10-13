@@ -37,8 +37,17 @@ So the setup has two parts: the skills themselves and a server for the data.
 
 ### 1. Install the skills
 
-Install each skill by its own folder, as described under
-[Installing](../README.md#installing) in the main README.
+Each skill comes as a ZIP of its own from the newest release:
+
+| Skill | Download | Claude Code |
+|---|---|---|
+| asset-analysis | [asset-analysis.zip](https://github.com/benethos-hub/agent-skills/releases/latest/download/asset-analysis.zip) | `claude plugin install asset-analysis@benethos-agent-skills` |
+| dividend-calendar | [dividend-calendar.zip](https://github.com/benethos-hub/agent-skills/releases/latest/download/dividend-calendar.zip) | `claude plugin install dividend-calendar@benethos-agent-skills` |
+
+In claude.ai and Claude Desktop, upload the ZIP in the settings under Skills.
+Claude Code needs the marketplace once before the install command, see
+[Installing](../README.md#installing) in the main README. The same section
+covers other agents and updates.
 
 ### 2. Connect a market-data server
 
@@ -80,14 +89,27 @@ only one of the two ways. With both, every tool appears twice.
 #### Claude Code
 
 This needs [uv](https://docs.astral.sh/uv/getting-started/installation/). The
-following command makes the server available in every project:
+marketplace of this repository offers the server as a plugin of its own, next
+to the skills:
+
+```bash
+claude plugin install benethos-yahoo-finance-mcp@benethos-agent-skills
+```
+
+The marketplace has to be added once before, see
+[Installing](../README.md#installing) in the main README. No skill installs the
+server by itself, because the skills work with any provider of the same data.
+
+Without the marketplace, the following command makes the server available in
+every project:
 
 ```bash
 claude mcp add --scope user benethos-yahoo-finance-mcp -- uvx benethos-yahoo-finance-mcp
 ```
 
-Without `--scope user` it applies to the current project only. `claude mcp list`
-shows whether the server is connected.
+Without `--scope user` it applies to the current project only. Use only one of
+the two ways. With both, the server runs twice and every tool appears twice.
+`claude mcp list` shows whether the server is connected.
 
 #### Claude in the browser
 

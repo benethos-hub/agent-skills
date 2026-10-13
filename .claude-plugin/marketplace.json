@@ -1,0 +1,52 @@
+{
+  "name": "benethos-agent-skills",
+  "owner": {
+    "name": "Benedikt Oswald"
+  },
+  "metadata": {
+    "description": "Skills for AI agents to the open Agent Skills standard."
+  },
+  "plugins": [
+    {
+      "name": "asset-analysis",
+      "description": "Writes a structured analysis of a single security from current price, fundamental and news data, with an assessment for the short, medium and long term. Use this skill whenever an ISIN, a ticker or a security's name comes up, or when someone asks about a stock, an ETF, a cryptocurrency, a price target, quarterly figures, analyst opinions, a valuation or a comparison of several securities, also when they only ask in passing what is going on with a title and the word analysis never falls. Not for a dividend calendar or a portfolio's distributions per month. Answers in the user's language.",
+      "source": "./",
+      "strict": false,
+      "category": "finance",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./finance/asset-analysis"
+      ]
+    },
+    {
+      "name": "dividend-calendar",
+      "description": "Builds a dividend calendar for a portfolio, for the current or a coming year, from each position's dividend history and with fixed, traceable calculation rules. Past months show what was paid, coming months the forecast, and every gap in the data is named. Use this skill whenever someone asks for a dividend calendar, for distributions per month, for a year's dividend income, or when each position pays, also when they only hand over a list of holdings with share counts. Answers in the user's language.",
+      "source": "./",
+      "strict": false,
+      "category": "finance",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./finance/dividend-calendar"
+      ]
+    },
+    {
+      "name": "benethos-yahoo-finance-mcp",
+      "description": "Market data from Yahoo Finance as an MCP server, for the finance skills. Read-only, no account and no API key. Needs uv.",
+      "category": "finance",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/yahoo-finance-mcp",
+      "mcpServers": {
+        "benethos-yahoo-finance-mcp": {
+          "command": "uvx",
+          "args": [
+            "benethos-yahoo-finance-mcp"
+          ]
+        }
+      },
+      "source": "./",
+      "strict": false
+    }
+  ]
+}

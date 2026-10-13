@@ -1,0 +1,53 @@
+name: Release
+
+# Attaches one ZIP per skill and the index skills.json to a GitHub release
+# when it is published. The repository stays the source, the archives are
+# build results and are never checked in.
+#
+# Each skill goes up once, as <skill-name>.zip. The name carries no version,
+# so the READMEs have a link that always reaches the newest full release,
+# and every release keeps its own copy under its tag:
+#   releases/latest/download/<skill-name>.zip
+#   releases/download/vX.Y.Z/<skill-name>.zip
+# skills.json lists every skill with its header, both links, size and SHA-256.
+#
+# A release starts from a tag vX.Y.Z on main. The version comes from the
+# newest heading in CHANGELOG.md, and its section becomes the release notes:
+#   gh release create v0.1.0 --target main \
+#     --notes "$(python3 .github/scripts/skills.py version --notes)"
+# The job stops before uploading anything if the tag is not that version or
+# a test fails, a stale version number in a Markdown file among them.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  attach:
+    name: Attach the skill archives
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # upload the archives as release assets
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The write token is for the upload, nothing here pushes.
+          persist-credentials: false
+
+      - name: The tag is the version in CHANGELOG.md
+        run: python3 .github/scripts/skills.py version --tag "$GITHUB_REF_NAME"
+
+      - name: Tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Check and pack
+        run: python3 .github/scripts/skills.py pack "$RUNNER_TEMP/skills" --version "${GITHUB_REF_NAME#v}"
+
+      - name: Attach them to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" "$RUNNER_TEMP"/skills/*.zip "$RUNNER_TEMP/skills/skills.json"
