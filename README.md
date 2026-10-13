@@ -148,7 +148,8 @@ They check:
   is its newest version.
 - **Delivery.** The ZIPs hold one folder each and leave out test material, the
   index matches them, and the same content gives the same bytes on every
-  machine. The workflows pin every action to a commit.
+  machine. The workflows pin every action to a commit, except the shared
+  workflows of the organisation, which follow its `main`.
 
 External links are only fetched on request, because that needs the network:
 

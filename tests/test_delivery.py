@@ -219,6 +219,10 @@ class WorkflowTest(unittest.TestCase):
                 match = re.search(r"uses:\s*(\S+)", line)
                 if not match or match.group(1).startswith("./"):
                     continue
+                # Reusable workflows of the organisation follow its main, so a
+                # change to a shared rule reaches every repository at once.
+                if match.group(1).startswith("benethos-hub/.github/.github/workflows/"):
+                    continue
                 with self.subTest(line=f"{rel(path)}:{number}"):
                     self.assertRegex(line, r"@[0-9a-f]{40} # v\d", "pin to a full SHA with the version as comment")
 

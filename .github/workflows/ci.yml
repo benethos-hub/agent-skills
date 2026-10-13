@@ -38,3 +38,9 @@ jobs:
             unzip -l "$archive"
           done
           cat "$RUNNER_TEMP/skills/skills.json"
+
+  # The organisation's check that assets/brand holds icon.svg and a 512x512
+  # icon.png not older than the SVG. It follows main on purpose, so a change
+  # to the brand rules reaches every repository at once.
+  brand:
+    uses: benethos-hub/.github/.github/workflows/brand.yml@main
