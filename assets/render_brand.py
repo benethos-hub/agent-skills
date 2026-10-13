@@ -59,11 +59,8 @@ PREVIEW = """\
           fill="#22D3EE">benethos-hub/agent-skills</text>
     <text x="380" y="282" font-size="68" font-weight="700" fill="#F8FAFC"
           >Agent Skills</text>
-    <g font-size="25" fill="#CBD5E1">
-      <text x="380" y="346">Skills for AI agents to the open Agent Skills standard.</text>
-      <text x="380" y="382"
-            >Finance: security analysis and a dividend calendar.</text>
-    </g>
+    <text x="380" y="346" font-size="25" fill="#CBD5E1"
+          >Skills for AI agents to the open Agent Skills standard.</text>
     {chips}
     <text x="380" y="584" font-size="18" fill="#7C8AB8"
           >Written in English, answers in the user's language. MIT licensed.</text>
@@ -112,7 +109,7 @@ def render(svg: str, width: int, height: int, target: Path) -> None:
 
 def main() -> None:
     render(ICON_SVG.read_text(encoding="utf-8"), ICON_SIZE, ICON_SIZE, ICON_PNG)
-    preview = PREVIEW.format(icon=_icon(80, 200, 240), chips=_chips(380, 452))
+    preview = PREVIEW.format(icon=_icon(80, 200, 240), chips=_chips(380, 408))
     render(preview, PREVIEW_WIDTH, PREVIEW_HEIGHT, PREVIEW_PNG)
 
 
