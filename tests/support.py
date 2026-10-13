@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,6 +19,8 @@ def load_skills_module():
     path = ROOT / ".github" / "scripts" / "skills.py"
     spec = importlib.util.spec_from_file_location("skills", path)
     module = importlib.util.module_from_spec(spec)
+    # dataclass looks the module up in sys.modules while it runs.
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
