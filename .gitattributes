@@ -3,3 +3,4 @@
 # checkout with CRLF would build other archives than CI and fail the tests.
 * text=auto eol=lf
 *.zip binary
+*.png binary

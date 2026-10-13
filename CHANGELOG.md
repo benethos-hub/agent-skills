@@ -11,7 +11,8 @@ The newest version below is the one the next release must carry. Every
 
 ### Added
 
-- The icon next to the title of the README.
+- The icon next to the title of the README, as `assets/brand/icon.svg` and
+  a 512x512 `icon.png` that `assets/render_icon.py` draws from it.
 
 ### Changed
 
