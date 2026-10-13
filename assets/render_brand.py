@@ -63,7 +63,7 @@ PREVIEW = """\
           >Skills for AI agents to the open Agent Skills standard.</text>
     {chips}
     <text x="380" y="584" font-size="18" fill="#7C8AB8"
-          >Written in English, answers in the user's language. MIT licensed.</text>
+          >MIT licensed.</text>
   </g>
 </svg>
 """
