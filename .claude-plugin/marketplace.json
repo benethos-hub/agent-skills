@@ -42,6 +42,32 @@
       ]
     },
     {
+      "name": "finance",
+      "description": "Every finance skill in one plugin, with the MCP server benethos-yahoo-finance-mcp for the data. Skills for securities and portfolios. They calculate from current market data and name every gap in it. They give no recommendation and no investment, tax or legal advice.",
+      "version": "0.1.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.1.0"
+      },
+      "strict": false,
+      "category": "finance",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/finance/asset-analysis",
+        "./skills/finance/dividend-calendar"
+      ],
+      "mcpServers": {
+        "benethos-yahoo-finance-mcp": {
+          "command": "uvx",
+          "args": [
+            "benethos-yahoo-finance-mcp"
+          ]
+        }
+      }
+    },
+    {
       "name": "benethos-yahoo-finance-mcp",
       "description": "Market data from Yahoo Finance as an MCP server, for the finance skills. Read-only, no account and no API key. Needs uv.",
       "category": "finance",

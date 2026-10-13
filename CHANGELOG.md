@@ -17,9 +17,16 @@ The newest version below is the one the next release must carry. Every
   the repository link is shared. `assets/render_brand.py` draws both PNGs
   from the SVG.
 - CI runs the brand check of the organisation, which tests both files.
+- A bundle per category in the Claude Code marketplace. `finance` installs
+  both finance skills and the market-data server with one command. The
+  single plugins stay.
 
 ### Changed
 
+- The READMEs start with the shortest way for each client and give the
+  steps as numbered lists. The finance README has a quick start. The main
+  README keeps what concerns maintainers under its own heading and explains
+  how Claude Code finds the marketplace.
 - The categories moved into `skills/`, so a skill now lies in
   `skills/<category>/<skill-name>/`. The ZIPs keep their content, they never
   carried the category. In Claude Code the marketplace on `main` already names

@@ -161,7 +161,7 @@ class MarketplaceTest(unittest.TestCase):
 
     def test_skills_come_from_the_current_release(self):
         number, _ = skills.current_version((ROOT / "CHANGELOG.md").read_text(encoding="utf-8"))
-        names = {f.name for c in categories() for f in skill_folders(c)}
+        names = {f.name for c in categories() for f in skill_folders(c)} | {c.name for c in categories()}
         for plugin in self.document["plugins"]:
             if plugin["name"] not in names:
                 continue
@@ -171,6 +171,17 @@ class MarketplaceTest(unittest.TestCase):
                 # The "github" source clones over SSH, which fails without a key.
                 self.assertEqual(plugin["source"]["source"], "url")
                 self.assertTrue(plugin["source"]["url"].startswith("https://"))
+
+    def test_every_category_is_a_bundle(self):
+        plugins = {p["name"]: p for p in self.document["plugins"]}
+        for category in categories():
+            servers = [p for p in skills.MCP_PLUGINS if p["category"] == category.name]
+            with self.subTest(category=category.name):
+                self.assertIn(category.name, plugins)
+                bundle = plugins[category.name]
+                self.assertEqual(bundle["skills"], [f"./{rel(f)}" for f in skill_folders(category)])
+                expected = {k: v for p in servers for k, v in p["mcpServers"].items()}
+                self.assertEqual(bundle.get("mcpServers", {}), expected)
 
     def test_plugin_names_are_unique(self):
         names = [p["name"] for p in self.document["plugins"]]
@@ -201,6 +212,12 @@ class ReadmeTest(unittest.TestCase):
                     self.assertIn(f"]({name}/SKILL.md)", text, "no link to the SKILL.md")
                     self.assertIn(f"/releases/latest/download/{name}.zip", text, "no download link")
                     self.assertIn(f"claude plugin install {name}@{MARKETPLACE}", text, "no install command")
+
+    def test_category_readme_names_its_bundle(self):
+        for category in categories():
+            text = (category / "README.md").read_text(encoding="utf-8")
+            with self.subTest(category=category.name):
+                self.assertIn(f"claude plugin install {category.name}@{MARKETPLACE}", text)
 
     def test_category_readme_names_its_mcp_plugins(self):
         for plugin in skills.MCP_PLUGINS:
