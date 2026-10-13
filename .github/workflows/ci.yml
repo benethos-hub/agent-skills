@@ -1,0 +1,40 @@
+name: CI
+
+# Runs the tests and packs every skill the way a release would, so a broken
+# header, a dead link or a stale version number shows on the push and not
+# only when a release is published.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Nothing here writes anything back.
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Check and pack the skills
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Check and pack
+        run: python3 .github/scripts/skills.py pack "$RUNNER_TEMP/skills"
+
+      - name: List the archives and the index
+        run: |
+          set -euo pipefail
+          for archive in "$RUNNER_TEMP"/skills/*.zip; do
+            echo "== $(basename "$archive")"
+            unzip -l "$archive"
+          done
+          cat "$RUNNER_TEMP/skills/skills.json"
