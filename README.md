@@ -11,13 +11,15 @@ The skills are written in English and answer in the language of the user.
 
 - [Categories](#categories)
 - [Installing](#installing)
-  - [Claude in the browser and in Claude Desktop](#claude-in-the-browser-and-in-claude-desktop)
   - [Claude Code](#claude-code)
+  - [Claude in the browser and in Claude Desktop](#claude-in-the-browser-and-in-claude-desktop)
   - [Other agents](#other-agents)
   - [Updates](#updates)
-- [Releases](#releases)
-- [Tests](#tests)
-- [Layout](#layout)
+- [Maintaining](#maintaining)
+  - [Releases](#releases)
+  - [How Claude Code finds the marketplace](#how-claude-code-finds-the-marketplace)
+  - [Tests](#tests)
+  - [Layout](#layout)
   - [Rules for a new skill](#rules-for-a-new-skill)
 - [Disclaimer](#disclaimer)
 - [License](#license)
@@ -32,59 +34,90 @@ its own README with its skills, what they need and how to set it up.
 | [finance](skills/finance/README.md) | Securities and portfolios, calculated from current market data | [asset-analysis](skills/finance/asset-analysis/SKILL.md), [dividend-calendar](skills/finance/dividend-calendar/SKILL.md) |
 
 Some skills only give a useful answer when the agent can reach the right MCP
-server. Read the category's README before installing.
+server. The category's README says which one and how to connect it.
 
 ## Installing
 
-Every skill is a folder `skills/<category>/<skill-name>/` in this repository.
-Each release also carries every
-skill as a ZIP of its own, and the newest one is always reachable under the
-same link:
+The shortest way depends on the client:
+
+| Client | Shortest way |
+|---|---|
+| Claude Code | Add the marketplace, then install the bundle of a category. Two commands, MCP servers included. |
+| claude.ai and Claude Desktop | Download the skill's ZIP and upload it under Settings, Skills. |
+| Other agents | Unpack the skill's ZIP into the agent's skills directory. |
+
+Every release carries each skill as a ZIP of its own. The category's README
+links them directly. The newest one is always reachable under the same link:
 
 ```
 https://github.com/benethos-hub/agent-skills/releases/latest/download/<skill-name>.zip
 ```
 
-`skills/` and the categories only order this repository. Agents look for a
-skill's folder directly in their skills directory, not inside a category.
+### Claude Code
+
+1. Add this repository as a plugin marketplace. This is needed once:
+
+   ```bash
+   claude plugin marketplace add benethos-hub/agent-skills
+   ```
+
+2. Install the bundle of a category. It brings every skill of the category
+   and the MCP servers they work with:
+
+   ```bash
+   claude plugin install finance@benethos-agent-skills
+   ```
+
+   To pick single skills instead, install each as a plugin of its own:
+
+   ```bash
+   claude plugin install dividend-calendar@benethos-agent-skills
+   ```
+
+Take either the bundle of a category or single skills from it, not both. A
+skill that comes from both is loaded twice.
+
+Claude Code installs the state of the newest release, the same the ZIPs carry.
+Changes on `main` that are not released yet do not reach it.
+
+Without the marketplace, unpack a skill's ZIP into `~/.claude/skills/` to use
+it in every project, or into `.claude/skills/` inside one project. MCP servers
+are then set up by hand, as the category's README describes.
 
 ### Claude in the browser and in Claude Desktop
 
-Download the skill's ZIP from the link above and upload it in the settings
-under Skills. The skill is then available in your account and is used when a
-task fits.
-
-### Claude Code
-
-Add this repository as a plugin marketplace once, then install each skill you
-want as a plugin of its own:
-
-```bash
-claude plugin marketplace add benethos-hub/agent-skills
-claude plugin install dividend-calendar@benethos-agent-skills
-```
-
-A skill installed this way is the one of the newest release, the same the ZIP
-carries. Changes on `main` that are not released yet do not reach it.
-
-Without the marketplace, unpack the skill's ZIP into `~/.claude/skills/` to use
-it in every project, or into `.claude/skills/` inside one project.
+1. Download the skill's ZIP. The category's README has a direct link for each
+   skill.
+2. Upload it in the settings under Skills. The skill is then available in your
+   account and is used when a task fits.
+3. Connect the MCP server the skill needs, as the category's README
+   describes.
 
 ### Other agents
 
-Unpack the skill's ZIP into the agent's skills directory. Its location differs
-from agent to agent and has changed over time, so check the agent's
-documentation.
+Unpack the skill's ZIP into the agent's skills directory. The ZIP holds the
+skill's folder, ready to use. Agents look for a skill's folder directly in
+that directory, not inside a category. Where the directory lies differs from
+agent to agent and has changed over time, so check the agent's documentation.
 
 ### Updates
 
-An installed skill from a ZIP is a copy and does not update itself. Download
-the ZIP of the newest release again and replace the old one. In Claude Code,
-`claude plugin marketplace update benethos-agent-skills` fetches the newest
-state of the marketplace, and `claude plugin update <skill-name>@benethos-agent-skills`
-updates an installed skill.
+In Claude Code, fetch the newest state of the marketplace, then update what
+you installed:
 
-## Releases
+```bash
+claude plugin marketplace update benethos-agent-skills
+claude plugin update finance@benethos-agent-skills
+```
+
+A skill from a ZIP is a copy and does not update itself. Download the ZIP of
+the newest release again and replace the old one.
+
+## Maintaining
+
+This part is for whoever changes the repository.
+
+### Releases
 
 The version lives in [CHANGELOG.md](CHANGELOG.md). Its newest heading of the
 form `## [X.Y.Z] - YYYY-MM-DD` is the version the next release carries. A
@@ -117,14 +150,25 @@ https://github.com/benethos-hub/agent-skills/releases/download/v0.1.0/<skill-nam
 
 The archives are build results and are never checked in.
 
-`.claude-plugin/marketplace.json` is generated from the skills and checked in,
-because Claude Code reads it from the repository. Each skill's plugin takes
-its files from the release tag over HTTPS, so Claude Code installs exactly the
-released state. Besides the skills it offers
-MCP servers a category needs, each as a plugin of its own. They are listed in
-`MCP_PLUGINS` in `.github/scripts/skills.py`.
+### How Claude Code finds the marketplace
 
-## Tests
+Claude Code looks for the marketplace in one fixed place,
+`.claude-plugin/marketplace.json`. Adding the marketplace clones the
+repository and reads that file. Its
+`name` field, `benethos-agent-skills`, is the part after the `@` in every
+install command. The repository's name plays no part there.
+
+The file is read from `main`. Each plugin in it takes its files from the
+release tag it names. That is why the file has to name the new tag before a
+release, and why the release follows the merge right away.
+
+The file is generated from the skills and never edited by hand. It holds one
+plugin per skill, one bundle per category and each MCP server on its own. A
+bundle carries every skill of its category and the MCP servers listed for
+that category in `MCP_PLUGINS` in `.github/scripts/skills.py`. CI fails when
+the file no longer matches the skills.
+
+### Tests
 
 The tests use only the Python standard library and run on every push:
 
@@ -157,7 +201,7 @@ External links are only fetched on request, because that needs the network:
 LINKS_ONLINE=1 python3 -m unittest discover -s tests -v
 ```
 
-## Layout
+### Layout
 
 ```
 agent-skills/
@@ -168,7 +212,7 @@ agent-skills/
     brand/            # icon.svg, icon.png 512x512, social-preview.png 1280x640
     render_brand.py   # draws both PNGs from icon.svg: uv run assets/render_brand.py
   .claude-plugin/
-    marketplace.json  # generated, one plugin per skill and per MCP server for Claude Code
+    marketplace.json  # generated, for Claude Code: one plugin per skill, category and MCP server
   .github/
     scripts/skills.py # checks the skills, packs the ZIPs, writes both JSON files
     workflows/        # CI on every push, the release assets on every release
@@ -185,8 +229,9 @@ agent-skills/
 ### Rules for a new skill
 
 - It goes into the category under `skills/` that fits, or into a new one with
-  a short English name in lower case. A new category gets its own README.md and a row in the
-  table above.
+  a short English name in lower case. A new category gets its own README.md
+  and a row in the table above. The first paragraph of that README becomes
+  the description of the category's bundle in Claude Code.
 - The folder name equals `name` in the header: lower-case letters, digits and
   single hyphens, at most 64 characters. A name is used only once in the whole
   repository, because the ZIPs and plugins carry it without the category.

@@ -15,8 +15,9 @@ links, size and SHA-256. --version names the release the links point to.
 
 `marketplace` writes .claude-plugin/marketplace.json, through which Claude
 Code installs every skill as a plugin of its own, from the release tag of the
-newest version in CHANGELOG.md, and the MCP servers listed in MCP_PLUGINS as
-well. With --check it writes
+newest version in CHANGELOG.md, every category as a bundle of its skills and
+MCP servers, and the MCP servers listed in MCP_PLUGINS on their own as well.
+With --check it writes
 nothing and fails if the file in the repository is not what it would write.
 
 `version` prints the newest version in CHANGELOG.md. With --tag it fails
@@ -232,40 +233,86 @@ def pack(out_dir: Path, version: str | None) -> None:
     print(f"index: {len(index)} skills -> skills.json")
 
 
+def category_summary(category: str) -> str:
+    """The first paragraph of the category's README, below its title."""
+    readme = ROOT / "skills" / category / "README.md"
+    if not readme.is_file():
+        sys.exit(f"skills/{category}/README.md is missing.")
+    paragraph: list[str] = []
+    for line in readme.read_text(encoding="utf-8").splitlines()[1:]:
+        if line.strip():
+            paragraph.append(line.strip())
+        elif paragraph:
+            break
+    return " ".join(paragraph)
+
+
 def marketplace_document(skills: list[Skill], version: str) -> dict[str, object]:
     # One plugin per skill, so each can be installed alone, as with the ZIPs.
     # Its files come from the release tag of the newest version in the
     # changelog, so Claude Code gets what the ZIPs carry and not whatever
     # main holds. The source is a git URL over HTTPS: the "github" source
     # clones over SSH and fails for everyone without a key for GitHub.
-    # With strict off, the entry itself names the one skill folder to load.
-    # The MCP servers follow. They carry no files, only the command.
-    servers = [{**plugin, "source": "./", "strict": False} for plugin in MCP_PLUGINS]
-    taken = {skill.name for skill in skills} & {plugin["name"] for plugin in MCP_PLUGINS}
-    if taken:
-        sys.exit(f"Plugin names used by a skill and an MCP server: {', '.join(sorted(taken))}")
+    # With strict off, the entry itself names the skill folders to load.
+    #
+    # Then one bundle per category: every skill of it and the MCP servers of
+    # the same category, installed with a single command. No skill depends
+    # on a server, the bundle only offers both together.
+    #
+    # The MCP servers follow on their own. They carry no files, only the
+    # command.
     release = {"source": "url", "url": f"{REPOSITORY_URL}.git", "ref": f"v{version}"}
+    categories = sorted({skill.category for skill in skills})
+    names = [skill.name for skill in skills] + categories + [p["name"] for p in MCP_PLUGINS]
+    taken = sorted({name for name in names if names.count(name) > 1})
+    if taken:
+        sys.exit(f"Plugin names used twice by skills, categories or MCP servers: {', '.join(taken)}")
+
+    plugins: list[dict[str, object]] = [
+        {
+            "name": skill.name,
+            "description": skill.header["description"],
+            "version": version,
+            "source": release,
+            "strict": False,
+            "category": skill.category,
+            "license": skill.header.get("license"),
+            "repository": REPOSITORY_URL,
+            "skills": [f"./{skill.path}"],
+        }
+        for skill in skills
+    ]
+    for category in categories:
+        members = [skill for skill in skills if skill.category == category]
+        servers = [p for p in MCP_PLUGINS if p["category"] == category]
+        with_servers = ""
+        if servers:
+            listed = ", ".join(p["name"] for p in servers)
+            with_servers = f", with the MCP server{'s' if len(servers) > 1 else ''} {listed} for the data"
+        bundle: dict[str, object] = {
+            "name": category,
+            "description": f"Every {category} skill in one plugin{with_servers}. {category_summary(category)}",
+            "version": version,
+            "source": release,
+            "strict": False,
+            "category": category,
+        }
+        licenses = {skill.header.get("license") for skill in members}
+        if len(licenses) == 1:
+            bundle["license"] = licenses.pop()
+        bundle["repository"] = REPOSITORY_URL
+        bundle["skills"] = [f"./{skill.path}" for skill in members]
+        if servers:
+            bundle["mcpServers"] = {k: v for p in servers for k, v in p["mcpServers"].items()}
+        plugins.append(bundle)
+    plugins += [{**plugin, "source": "./", "strict": False} for plugin in MCP_PLUGINS]
     return {
         "name": MARKETPLACE_NAME,
         "owner": {"name": OWNER},
         "metadata": {
             "description": "Skills for AI agents to the open Agent Skills standard.",
         },
-        "plugins": [
-            {
-                "name": skill.name,
-                "description": skill.header["description"],
-                "version": version,
-                "source": release,
-                "strict": False,
-                "category": skill.category,
-                "license": skill.header.get("license"),
-                "repository": REPOSITORY_URL,
-                "skills": [f"./{skill.path}"],
-            }
-            for skill in skills
-        ]
-        + servers,
+        "plugins": plugins,
     }
 
 

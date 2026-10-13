@@ -7,7 +7,8 @@ legal advice.
 **Contents**
 
 - [Skills](#skills)
-- [Setup](#setup)
+- [Quick start](#quick-start)
+- [Setup in detail](#setup-in-detail)
   - [1. Install the skills](#1-install-the-skills)
   - [2. Connect a market-data server](#2-connect-a-market-data-server)
   - [3. Web search](#3-web-search)
@@ -24,8 +25,6 @@ legal advice.
 | [asset-analysis](asset-analysis/SKILL.md) | An analysis of a single security with own calculations, data traps checked, an assessment by horizon and no recommendation | a market-data MCP server, a web search helps |
 | [dividend-calendar](dividend-calendar/SKILL.md) | A dividend calendar for a portfolio, current or coming year, paid and forecast kept apart, with a list of gaps | a market-data MCP server |
 
-## Setup
-
 A skill brings the method, not the data. The finance skills need prices,
 dividend histories, corporate calendars, financial statements and analyst
 targets, and all of it changes daily. Without a market-data MCP server the
@@ -33,11 +32,46 @@ agent has no reliable source for any of it. The skills then say so openly
 instead of filling the gap from memory, and the answer is little more than a
 list of what is missing.
 
-So the setup has two parts: the skills themselves and a server for the data.
+So every setup has two parts: the skills and a server for the data.
+
+## Quick start
+
+The shortest way for each client, simplest first:
+
+| Client | Steps |
+|---|---|
+| Claude Code | Add the marketplace and install the bundle `finance`. It brings both skills and the market-data server. Needs [uv](https://docs.astral.sh/uv/getting-started/installation/). |
+| Claude Desktop | Upload both ZIPs under Settings, Skills. Then open the server's extension `benethos-yahoo-finance-mcp.mcpb`. |
+| Other agents | Unpack both ZIPs into the agent's skills directory and add the server with `uvx benethos-yahoo-finance-mcp`. |
+| claude.ai in the browser | Upload both ZIPs. The server only works there as your own hosted service. |
+
+For Claude Code these are the two commands:
+
+```bash
+claude plugin marketplace add benethos-hub/agent-skills
+claude plugin install finance@benethos-agent-skills
+```
+
+Then check the setup as in [step 4](#4-check-the-setup). The sections below
+explain each part and the other ways.
+
+## Setup in detail
 
 ### 1. Install the skills
 
-Each skill comes as a ZIP of its own from the newest release:
+**Claude Code.** The bundle installs both skills and the market-data server
+from step 2 at once. The marketplace has to be added once before:
+
+```bash
+claude plugin marketplace add benethos-hub/agent-skills
+claude plugin install finance@benethos-agent-skills
+```
+
+Install either the bundle or single skills, not both. A skill that comes
+from both is loaded twice.
+
+**Single skills.** Each skill also comes on its own, as a ZIP from the newest
+release and as a plugin of its own:
 
 | Skill | Download | Claude Code |
 |---|---|---|
@@ -45,9 +79,8 @@ Each skill comes as a ZIP of its own from the newest release:
 | dividend-calendar | [dividend-calendar.zip](https://github.com/benethos-hub/agent-skills/releases/latest/download/dividend-calendar.zip) | `claude plugin install dividend-calendar@benethos-agent-skills` |
 
 In claude.ai and Claude Desktop, upload the ZIP in the settings under Skills.
-Claude Code needs the marketplace once before the install command, see
-[Installing](../../README.md#installing) in the main README. The same section
-covers other agents and updates.
+Other agents and updates are covered under
+[Installing](../../README.md#installing) in the main README.
 
 ### 2. Connect a market-data server
 
@@ -57,6 +90,32 @@ provider works. They are tested with the
 It needs no account and no API key. The steps below set up this server. Its
 [README](https://github.com/benethos-hub/yahoo-finance-mcp#installation) has
 further ways to install it.
+
+Set the server up one way only. Two ways at once can start it twice, and
+every tool then appears twice.
+
+#### Claude Code
+
+With the bundle `finance` from step 1 the server is already there. Nothing
+else is needed.
+
+Without the bundle, install the server as a plugin of its own. It needs
+[uv](https://docs.astral.sh/uv/getting-started/installation/) and the
+marketplace from step 1:
+
+```bash
+claude plugin install benethos-yahoo-finance-mcp@benethos-agent-skills
+```
+
+Without the marketplace, this command makes the server available in every
+project. Without `--scope user` it applies to the current project only:
+
+```bash
+claude mcp add --scope user benethos-yahoo-finance-mcp -- uvx benethos-yahoo-finance-mcp
+```
+
+`claude mcp list` shows whether the server is connected. No skill installs the
+server by itself, because the skills work with any provider of the same data.
 
 #### Claude Desktop
 
@@ -83,33 +142,19 @@ Developer, Edit Config and add to `claude_desktop_config.json`:
 }
 ```
 
-Then quit Claude Desktop fully, from the tray as well, and start it again. Use
-only one of the two ways. With both, every tool appears twice.
+Then quit Claude Desktop fully, from the tray as well, and start it again.
 
-#### Claude Code
+#### Other agents
 
-This needs [uv](https://docs.astral.sh/uv/getting-started/installation/). The
-marketplace of this repository offers the server as a plugin of its own, next
-to the skills:
+Every MCP client that starts local servers can use the same command. It needs
+[uv](https://docs.astral.sh/uv/getting-started/installation/):
 
-```bash
-claude plugin install benethos-yahoo-finance-mcp@benethos-agent-skills
+```json
+{ "command": "uvx", "args": ["benethos-yahoo-finance-mcp"] }
 ```
 
-The marketplace has to be added once before, see
-[Installing](../../README.md#installing) in the main README. No skill installs the
-server by itself, because the skills work with any provider of the same data.
-
-Without the marketplace, the following command makes the server available in
-every project:
-
-```bash
-claude mcp add --scope user benethos-yahoo-finance-mcp -- uvx benethos-yahoo-finance-mcp
-```
-
-Without `--scope user` it applies to the current project only. Use only one of
-the two ways. With both, the server runs twice and every tool appears twice.
-`claude mcp list` shows whether the server is connected.
+Where this entry goes differs from client to client. The server's README lists
+[compatible clients](https://github.com/benethos-hub/yahoo-finance-mcp#compatible-clients).
 
 #### Claude in the browser
 
@@ -118,17 +163,6 @@ servers on the internet, added as a custom connector. The Yahoo Finance server
 can run that way, but only as your own hosted service with HTTPS. Its
 [containers README](https://github.com/benethos-hub/yahoo-finance-mcp/blob/main/containers/README.md)
 describes that setup. For most people Claude Desktop is the easier way.
-
-#### Other agents
-
-Every MCP client that starts local servers can use the same command:
-
-```json
-{ "command": "uvx", "args": ["benethos-yahoo-finance-mcp"] }
-```
-
-Where this entry goes differs from client to client. The server's README lists
-[compatible clients](https://github.com/benethos-hub/yahoo-finance-mcp#compatible-clients).
 
 ### 3. Web search
 
@@ -140,8 +174,9 @@ missing. `dividend-calendar` does not use a web search.
 ### 4. Check the setup
 
 Start a new chat and ask for the current price of a ticker you know. If the
-agent calls a tool of the server and names a price, the server is connected. If the agent
-says it has no current data, the server is missing or not started.
+agent calls a tool of the server and names a price, the server is connected.
+If the agent says it has no current data, the server is missing or not
+started.
 
 ## Data the skills use
 
