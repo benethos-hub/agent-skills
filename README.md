@@ -1,4 +1,4 @@
-# Agent Skills
+# <img src="assets/brand/logo.svg" alt="" width="40" height="40"> Agent Skills
 
 Skills for AI agents, written to the open [Agent Skills](https://agentskills.io)
 standard: one folder per skill with a `SKILL.md`, a header with `name` and
@@ -161,6 +161,7 @@ agent-skills/
   README.md
   CHANGELOG.md        # the version and what changed
   LICENSE
+  assets/brand/       # the logo
   .claude-plugin/
     marketplace.json  # generated, one plugin per skill and per MCP server for Claude Code
   .github/

@@ -9,6 +9,10 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+### Added
+
+- The logo next to the title of the README.
+
 ## [0.1.0] - 2026-10-13
 
 The first release, with two finance skills and a delivery for every client.

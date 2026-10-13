@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 # Top-level folders that are not a category.
-NOT_CATEGORIES = {"tests"}
+NOT_CATEGORIES = {"assets", "tests"}
 
 
 def load_skills_module():
@@ -56,6 +56,8 @@ FENCE = re.compile(r"^\s*(```|~~~)")
 INLINE_CODE = re.compile(r"`[^`]*`")
 HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 LINK = re.compile(r"!?\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+HTML_SOURCE = re.compile(r"<img\b[^>]*\bsrc=\"([^\"]+)\"")
+HTML_TAG = re.compile(r"<[^>]+>")
 
 
 @dataclass
@@ -83,7 +85,7 @@ def prose_lines(text: str) -> list[Line]:
 
 def slug(heading: str) -> str:
     """The anchor GitHub gives a heading."""
-    text = LINK.sub(r"\1", heading).replace("`", "").strip().lower()
+    text = HTML_TAG.sub("", LINK.sub(r"\1", heading)).replace("`", "").strip().lower()
     text = re.sub(r"[^\w\- ]", "", text)
     return text.replace(" ", "-")
 
@@ -124,8 +126,9 @@ class Link:
 
 
 def links(text: str) -> list[Link]:
-    return [
-        Link(line.number, match.group(2))
-        for line in prose_lines(text)
-        for match in LINK.finditer(line.text)
-    ]
+    """Markdown links and images, and the src of every HTML <img>."""
+    found: list[Link] = []
+    for line in prose_lines(text):
+        found += [Link(line.number, m.group(2)) for m in LINK.finditer(line.text)]
+        found += [Link(line.number, m.group(1)) for m in HTML_SOURCE.finditer(line.text)]
+    return found
