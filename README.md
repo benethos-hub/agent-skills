@@ -165,8 +165,8 @@ agent-skills/
   CHANGELOG.md        # the version and what changed
   LICENSE
   assets/
-    brand/            # icon.svg and icon.png, 512x512
-    render_icon.py    # draws icon.png from icon.svg: uv run assets/render_icon.py
+    brand/            # icon.svg, icon.png 512x512, social-preview.png 1280x640
+    render_brand.py   # draws both PNGs from icon.svg: uv run assets/render_brand.py
   .claude-plugin/
     marketplace.json  # generated, one plugin per skill and per MCP server for Claude Code
   .github/
