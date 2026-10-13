@@ -60,8 +60,11 @@ class PackTest(unittest.TestCase):
         for name in self.names:
             with zipfile.ZipFile(self.tmp / f"{name}.zip") as archive:
                 types = {entry.compress_type for entry in archive.infolist()}
+                systems = {entry.create_system for entry in archive.infolist()}
             with self.subTest(skill=name):
                 self.assertEqual(types, {zipfile.ZIP_STORED})
+                # The system Python would write differs between Windows and Unix.
+                self.assertEqual(systems, {3})
 
     def test_same_content_gives_same_bytes(self):
         again = Path(tempfile.mkdtemp())

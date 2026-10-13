@@ -194,6 +194,9 @@ def pack_one(skill: Skill, target: Path) -> int:
             entry = zipfile.ZipInfo(arcname, date_time=ZIP_DATE)
             entry.compress_type = zipfile.ZIP_STORED
             entry.external_attr = 0o644 << 16
+            # Python writes the system it runs on, 0 on Windows and 3 on Unix.
+            # Fixed to Unix, so a build on Windows matches the one in CI.
+            entry.create_system = 3
             archive.writestr(entry, path.read_bytes())
     return len(files)
 
