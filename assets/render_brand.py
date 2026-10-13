@@ -53,6 +53,7 @@ PREVIEW = """\
   </defs>
   <rect width="1280" height="640" fill="url(#sp-bg)"/>
   <rect x="0" y="632" width="1280" height="8" fill="url(#sp-line)" opacity="0.7"/>
+  {backdrop}
   {icon}
   <g font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif">
     <text x="380" y="200" font-family="Consolas, Menlo, monospace" font-size="26"
@@ -62,11 +63,24 @@ PREVIEW = """\
     <text x="380" y="346" font-size="25" fill="#CBD5E1"
           >Skills for AI agents to the open Agent Skills standard.</text>
     {chips}
-    <text x="380" y="584" font-size="18" fill="#7C8AB8"
-          >MIT licensed.</text>
+    <text x="380" y="500" font-size="18" fill="#7C8AB8"
+          >Open source under the MIT License.</text>
   </g>
 </svg>
 """
+
+# A faint editor window behind the text on the right, holding the head of a
+# SKILL.md. Placeholders instead of a real skill, so it names no category and
+# does not go stale. Each line is a key and its value, or plain text.
+BACKDROP_LINES = (
+    ("---", ""),
+    ("name: ", "skill-name"),
+    ("description: ", "What it does and"),
+    ("", "  when an agent should use it."),
+    ("license: ", "MIT"),
+    ("---", ""),
+    ("# Skill name", ""),
+)
 
 CHIPS = ("Agent Skills standard", "Claude Code marketplace", "ZIP per skill", "Tested")
 
@@ -84,6 +98,28 @@ def _chips(x: int, y: int) -> str:
             f'text-anchor="middle">{label}</text>'
         )
         x += width + 14
+    return "".join(parts)
+
+
+def _backdrop(x: int, bottom: int, width: int, opacity: float) -> str:
+    """The editor window with the SKILL.md head, faint enough to read past.
+
+    It starts above the image and runs past its right edge, so only its left
+    and bottom border show, as if cut out of a larger screen.
+    """
+    first_line = bottom - 28 * len(BACKDROP_LINES) - 10
+    parts = [
+        f'<g opacity="{opacity}">',
+        f'<rect x="{x}" y="-40" width="{width}" height="{bottom + 40}" rx="16" '
+        'fill="#0B1030" stroke="#22D3EE" stroke-width="2"/>',
+        '<g font-family="Consolas, Menlo, monospace" font-size="20">',
+    ]
+    for i, (key, value) in enumerate(BACKDROP_LINES):
+        parts.append(
+            f'<text x="{x + 28}" y="{first_line + 28 * i}" xml:space="preserve">'
+            f'<tspan fill="#7C6BFF">{key}</tspan><tspan fill="#22D3EE">{value}</tspan></text>'
+        )
+    parts.append("</g></g>")
     return "".join(parts)
 
 
@@ -109,7 +145,11 @@ def render(svg: str, width: int, height: int, target: Path) -> None:
 
 def main() -> None:
     render(ICON_SVG.read_text(encoding="utf-8"), ICON_SIZE, ICON_SIZE, ICON_PNG)
-    preview = PREVIEW.format(icon=_icon(80, 200, 240), chips=_chips(380, 408))
+    preview = PREVIEW.format(
+        backdrop=_backdrop(900, 262, 440, 0.22),
+        icon=_icon(80, 200, 240),
+        chips=_chips(380, 408),
+    )
     render(preview, PREVIEW_WIDTH, PREVIEW_HEIGHT, PREVIEW_PNG)
 
 
