@@ -52,6 +52,7 @@ PREVIEW = """\
     </linearGradient>
   </defs>
   <rect width="1280" height="640" fill="url(#sp-bg)"/>
+  {pattern}
   <rect x="0" y="632" width="1280" height="8" fill="url(#sp-line)" opacity="0.7"/>
   {backdrop}
   {icon}
@@ -101,6 +102,52 @@ def _chips(x: int, y: int) -> str:
     return "".join(parts)
 
 
+# Circuit traces like the ones in the icon, kept to the edges and away from
+# the text. Each is a list of points, the last one gets a node.
+TRACES = (
+    ((0, 92), (130, 92), (170, 132), (232, 132)),
+    ((0, 548), (210, 548), (250, 588), (330, 588)),
+    ((1280, 560), (1120, 560), (1080, 520), (960, 520)),
+    ((1280, 352), (1236, 352), (1206, 382)),
+)
+
+
+def _pattern() -> str:
+    """The ground behind everything: two soft glows, a dot grid fading out
+    to the left and a few circuit traces at the edges."""
+    defs = (
+        "<defs>"
+        '<radialGradient id="pt-violet" cx="0.5" cy="0.5" r="0.5">'
+        '<stop offset="0" stop-color="#7C6BFF" stop-opacity="0.35"/>'
+        '<stop offset="1" stop-color="#7C6BFF" stop-opacity="0"/></radialGradient>'
+        '<radialGradient id="pt-cyan" cx="0.5" cy="0.5" r="0.5">'
+        '<stop offset="0" stop-color="#22D3EE" stop-opacity="0.18"/>'
+        '<stop offset="1" stop-color="#22D3EE" stop-opacity="0"/></radialGradient>'
+        '<pattern id="pt-dots" width="28" height="28" patternUnits="userSpaceOnUse">'
+        '<circle cx="14" cy="14" r="1.4" fill="#A5B4FC"/></pattern>'
+        '<linearGradient id="pt-fade" x1="0" y1="0" x2="1" y2="0">'
+        '<stop offset="0.25" stop-color="#FFFFFF" stop-opacity="0"/>'
+        '<stop offset="1" stop-color="#FFFFFF" stop-opacity="1"/></linearGradient>'
+        '<mask id="pt-mask"><rect width="1280" height="640" fill="url(#pt-fade)"/></mask>'
+        "</defs>"
+    )
+    glows = (
+        '<ellipse cx="200" cy="320" rx="360" ry="300" fill="url(#pt-violet)"/>'
+        '<ellipse cx="1120" cy="600" rx="420" ry="260" fill="url(#pt-cyan)"/>'
+    )
+    dots = '<rect width="1280" height="640" fill="url(#pt-dots)" opacity="0.22" mask="url(#pt-mask)"/>'
+    traces = ['<g fill="none" stroke="#22D3EE" stroke-width="2" opacity="0.16">']
+    for points in TRACES:
+        line = " ".join(f"{x},{y}" for x, y in points)
+        end_x, end_y = points[-1]
+        traces.append(
+            f'<polyline points="{line}"/>'
+            f'<circle cx="{end_x}" cy="{end_y}" r="5" fill="#06091A"/>'
+        )
+    traces.append("</g>")
+    return defs + glows + dots + "".join(traces)
+
+
 def _backdrop(x: int, bottom: int, width: int, opacity: float) -> str:
     """The editor window with the SKILL.md head, faint enough to read past.
 
@@ -146,6 +193,7 @@ def render(svg: str, width: int, height: int, target: Path) -> None:
 def main() -> None:
     render(ICON_SVG.read_text(encoding="utf-8"), ICON_SIZE, ICON_SIZE, ICON_PNG)
     preview = PREVIEW.format(
+        pattern=_pattern(),
         backdrop=_backdrop(900, 262, 440, 0.22),
         icon=_icon(80, 200, 240),
         chips=_chips(380, 408),
