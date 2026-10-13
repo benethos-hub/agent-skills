@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import struct
 import unittest
 
 from support import ROOT, SKILLS, categories, rel, skill_folders, skills
@@ -45,6 +46,20 @@ class RootTest(unittest.TestCase):
         )
         expected = sorted(rel(f / "SKILL.md") for c in categories() for f in skill_folders(c))
         self.assertEqual(found, expected, "a SKILL.md belongs in skills/<category>/<skill-name>/")
+
+
+class BrandTest(unittest.TestCase):
+    """assets/render_icon.py draws icon.png from icon.svg. Both are committed."""
+
+    def test_icon_files_exist(self):
+        for name in ("icon.svg", "icon.png"):
+            self.assertTrue((ROOT / "assets" / "brand" / name).is_file(), f"assets/brand/{name} is missing")
+
+    def test_icon_png_is_512_square(self):
+        data = (ROOT / "assets" / "brand" / "icon.png").read_bytes()
+        self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n", "not a PNG")
+        width, height = struct.unpack(">II", data[16:24])
+        self.assertEqual((width, height), (512, 512), "run: uv run assets/render_icon.py")
 
 
 class CategoryTest(unittest.TestCase):
