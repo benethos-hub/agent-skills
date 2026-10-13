@@ -134,7 +134,7 @@ release takes five steps:
    fail. The release notes are the version's section of the changelog:
 
    ```bash
-   gh release create v0.1.0 --target main \
+   gh release create v0.2.0 --target main \
      --notes "$(python3 .github/scripts/skills.py version --notes)"
    ```
 
@@ -145,7 +145,7 @@ name, category, description, links, size and SHA-256. GitHub keeps the files
 of every release under its tag, so a fixed version stays reachable:
 
 ```
-https://github.com/benethos-hub/agent-skills/releases/download/v0.1.0/<skill-name>.zip
+https://github.com/benethos-hub/agent-skills/releases/download/v0.2.0/<skill-name>.zip
 ```
 
 The archives are build results and are never checked in.

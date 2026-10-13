@@ -9,6 +9,11 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-13
+
+A bundle per category for Claude Code, the skills under `skills/`, the
+brand assets, and READMEs that lead with the shortest way.
+
 ### Added
 
 - The icon next to the title of the README, as `assets/brand/icon.svg` and
@@ -29,9 +34,8 @@ The newest version below is the one the next release must carry. Every
   how Claude Code finds the marketplace.
 - The categories moved into `skills/`, so a skill now lies in
   `skills/<category>/<skill-name>/`. The ZIPs keep their content, they never
-  carried the category. In Claude Code the marketplace on `main` already names
-  the new paths, which v0.1.0 does not have, so installs through it work again
-  with the next release.
+  carried the category. Installs through the Claude Code marketplace, which
+  failed between the move and this release, work again.
 - The ZIPs store their files without compression. Deflate output depends on
   the zlib build, so the same content gave other bytes and another SHA-256 on
   another Python version or platform. Stored, it gives the same bytes
