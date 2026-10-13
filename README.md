@@ -63,6 +63,9 @@ claude plugin marketplace add benethos-hub/agent-skills
 claude plugin install dividend-calendar@benethos-agent-skills
 ```
 
+A skill installed this way is the one of the newest release, the same the ZIP
+carries. Changes on `main` that are not released yet do not reach it.
+
 Without the marketplace, unpack the skill's ZIP into `~/.claude/skills/` to use
 it in every project, or into `.claude/skills/` inside one project.
 
@@ -84,13 +87,17 @@ updates an installed skill.
 
 The version lives in [CHANGELOG.md](CHANGELOG.md). Its newest heading of the
 form `## [X.Y.Z] - YYYY-MM-DD` is the version the next release carries. A
-release takes four steps:
+release takes five steps:
 
 1. Move the entries under `[Unreleased]` into a new version section.
-2. Run the tests. They name every `vX.Y.Z` in a Markdown file that does not
+2. Regenerate the marketplace file, which points Claude Code to the new tag:
+   `python3 .github/scripts/skills.py marketplace`.
+3. Run the tests. They name every `vX.Y.Z` in a Markdown file that does not
    match the new version yet. Update those lines.
-3. Commit and push to `main`.
-4. Publish the release. Its notes are the version's section of the changelog:
+4. Merge into `main` through a pull request.
+5. Publish the release right after the merge. Until then the marketplace on
+   `main` names a tag that does not exist yet, and installs in Claude Code
+   fail. The release notes are the version's section of the changelog:
 
    ```bash
    gh release create v0.1.0 --target main \
@@ -110,7 +117,9 @@ https://github.com/benethos-hub/agent-skills/releases/download/v0.1.0/<skill-nam
 The archives are build results and are never checked in.
 
 `.claude-plugin/marketplace.json` is generated from the skills and checked in,
-because Claude Code reads it from the repository. Besides the skills it offers
+because Claude Code reads it from the repository. Each skill's plugin takes
+its files from the release tag over HTTPS, so Claude Code installs exactly the
+released state. Besides the skills it offers
 MCP servers a category needs, each as a plugin of its own. They are listed in
 `MCP_PLUGINS` in `.github/scripts/skills.py`.
 

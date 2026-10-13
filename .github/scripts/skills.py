@@ -13,8 +13,9 @@ Next to them goes skills.json, an index with each skill's header, download
 links, size and SHA-256. --version names the release the links point to.
 
 `marketplace` writes .claude-plugin/marketplace.json, through which Claude
-Code installs every skill as a plugin of its own, and the MCP servers listed
-in MCP_PLUGINS as well. With --check it writes
+Code installs every skill as a plugin of its own, from the release tag of the
+newest version in CHANGELOG.md, and the MCP servers listed in MCP_PLUGINS as
+well. With --check it writes
 nothing and fails if the file in the repository is not what it would write.
 
 `version` prints the newest version in CHANGELOG.md. With --tag it fails
@@ -224,14 +225,19 @@ def pack(out_dir: Path, version: str | None) -> None:
     print(f"index: {len(index)} skills -> skills.json")
 
 
-def marketplace_document(skills: list[Skill]) -> dict[str, object]:
+def marketplace_document(skills: list[Skill], version: str) -> dict[str, object]:
     # One plugin per skill, so each can be installed alone, as with the ZIPs.
-    # The source is the repository root, and with strict off the entry itself
-    # names the one skill folder the plugin loads. The MCP servers follow.
+    # Its files come from the release tag of the newest version in the
+    # changelog, so Claude Code gets what the ZIPs carry and not whatever
+    # main holds. The source is a git URL over HTTPS: the "github" source
+    # clones over SSH and fails for everyone without a key for GitHub.
+    # With strict off, the entry itself names the one skill folder to load.
+    # The MCP servers follow. They carry no files, only the command.
     servers = [{**plugin, "source": "./", "strict": False} for plugin in MCP_PLUGINS]
     taken = {skill.name for skill in skills} & {plugin["name"] for plugin in MCP_PLUGINS}
     if taken:
         sys.exit(f"Plugin names used by a skill and an MCP server: {', '.join(sorted(taken))}")
+    release = {"source": "url", "url": f"{REPOSITORY_URL}.git", "ref": f"v{version}"}
     return {
         "name": MARKETPLACE_NAME,
         "owner": {"name": OWNER},
@@ -242,7 +248,8 @@ def marketplace_document(skills: list[Skill]) -> dict[str, object]:
             {
                 "name": skill.name,
                 "description": skill.header["description"],
-                "source": "./",
+                "version": version,
+                "source": release,
                 "strict": False,
                 "category": skill.category,
                 "license": skill.header.get("license"),
@@ -256,20 +263,21 @@ def marketplace_document(skills: list[Skill]) -> dict[str, object]:
 
 
 def marketplace(check: bool) -> None:
-    expected = to_json(marketplace_document(load_skills()))
+    number, _ = current_version(CHANGELOG_FILE.read_text(encoding="utf-8"))
+    expected = to_json(marketplace_document(load_skills(), number))
     relative = MARKETPLACE_FILE.relative_to(ROOT).as_posix()
     if check:
         current = MARKETPLACE_FILE.read_text(encoding="utf-8") if MARKETPLACE_FILE.exists() else ""
         if current != expected:
             sys.exit(
-                f"{relative} does not match the skills. "
+                f"{relative} does not match the skills and the version in CHANGELOG.md. "
                 "Run: python3 .github/scripts/skills.py marketplace"
             )
-        print(f"{relative} matches the skills.")
+        print(f"{relative} matches the skills and version {number}.")
         return
     MARKETPLACE_FILE.parent.mkdir(exist_ok=True)
     MARKETPLACE_FILE.write_text(expected, encoding="utf-8", newline="\n")
-    print(f"wrote {relative}")
+    print(f"wrote {relative} for version {number}")
 
 
 def current_version(changelog: str) -> tuple[str, str]:

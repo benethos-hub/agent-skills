@@ -131,7 +131,8 @@ class MarketplaceTest(unittest.TestCase):
         self.document = json.loads(self.path.read_text(encoding="utf-8"))
 
     def test_file_is_current(self):
-        expected = skills.to_json(skills.marketplace_document(skills.load_skills()))
+        number, _ = skills.current_version((ROOT / "CHANGELOG.md").read_text(encoding="utf-8"))
+        expected = skills.to_json(skills.marketplace_document(skills.load_skills(), number))
         self.assertEqual(
             self.path.read_text(encoding="utf-8"),
             expected,
@@ -146,6 +147,19 @@ class MarketplaceTest(unittest.TestCase):
                     self.assertIn(folder.name, plugins)
                     self.assertEqual(plugins[folder.name]["skills"], [f"./{rel(folder)}"])
                     self.assertEqual(plugins[folder.name]["category"], category.name)
+
+    def test_skills_come_from_the_current_release(self):
+        number, _ = skills.current_version((ROOT / "CHANGELOG.md").read_text(encoding="utf-8"))
+        names = {f.name for c in categories() for f in skill_folders(c)}
+        for plugin in self.document["plugins"]:
+            if plugin["name"] not in names:
+                continue
+            with self.subTest(plugin=plugin["name"]):
+                self.assertEqual(plugin["version"], number)
+                self.assertEqual(plugin["source"]["ref"], f"v{number}")
+                # The "github" source clones over SSH, which fails without a key.
+                self.assertEqual(plugin["source"]["source"], "url")
+                self.assertTrue(plugin["source"]["url"].startswith("https://"))
 
     def test_plugin_names_are_unique(self):
         names = [p["name"] for p in self.document["plugins"]]
