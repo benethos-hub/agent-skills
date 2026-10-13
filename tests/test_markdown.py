@@ -47,6 +47,18 @@ class LinkTest(unittest.TestCase):
                 with self.subTest(link=f"{rel(path)}:{link.number}"):
                     self.assertNotRegex(link.target, own, "use a relative link")
 
+    def test_raw_links_to_this_repository_name_existing_files(self):
+        # The README shows the icon by its raw URL on main, as PyPI-style
+        # renderers need. The file behind it has to exist here too.
+        raw = re.compile(r"^https://raw\.githubusercontent\.com/benethos-hub/agent-skills/main/(.+)$")
+        for path in markdown_files():
+            for link in links(path.read_text(encoding="utf-8")):
+                match = raw.match(link.target)
+                if not match:
+                    continue
+                with self.subTest(link=f"{rel(path)}:{link.number}"):
+                    self.assertTrue((ROOT / match.group(1)).is_file(), f"{match.group(1)} does not exist")
+
     @unittest.skipUnless(os.environ.get("LINKS_ONLINE") == "1", "set LINKS_ONLINE=1 to fetch external links")
     def test_external_links_answer(self):
         seen: dict[str, str] = {}
