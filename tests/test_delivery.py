@@ -40,11 +40,26 @@ class PackTest(unittest.TestCase):
         self.index = json.loads((self.tmp / "skills.json").read_text(encoding="utf-8"))
         self.names = sorted(f.name for c in categories() for f in skill_folders(c))
 
-    def test_one_zip_per_skill_and_the_index(self):
+    def test_two_zips_per_skill_and_the_index(self):
         written = sorted(p.name for p in self.tmp.iterdir())
-        self.assertEqual(
-            written, sorted([f"{n}.zip" for n in self.names] + ["skills.json"])
-        )
+        expected = [f"{n}.zip" for n in self.names]
+        expected += [f"{n}-9.9.9.zip" for n in self.names]
+        self.assertEqual(written, sorted([*expected, "skills.json"]))
+
+    def test_versioned_zip_has_the_same_bytes(self):
+        for name in self.names:
+            with self.subTest(skill=name):
+                self.assertEqual(
+                    (self.tmp / f"{name}-9.9.9.zip").read_bytes(),
+                    (self.tmp / f"{name}.zip").read_bytes(),
+                )
+
+    def test_without_a_version_only_the_stable_names(self):
+        out = Path(tempfile.mkdtemp())
+        pack(out)
+        written = sorted(p.name for p in out.iterdir())
+        expected = [f"{n}.zip" for n in self.names]
+        self.assertEqual(written, sorted([*expected, "skills.json"]))
 
     def test_zip_holds_one_folder_with_skill_md(self):
         for name in self.names:
@@ -66,7 +81,7 @@ class PackTest(unittest.TestCase):
                 self.assertEqual(entry["size"], len(data))
                 self.assertTrue(
                     entry["url"].endswith(
-                        f"/releases/download/v9.9.9/{entry['name']}.zip"
+                        f"/releases/download/v9.9.9/{entry['name']}-9.9.9.zip"
                     )
                 )
                 self.assertTrue(

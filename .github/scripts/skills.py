@@ -14,8 +14,11 @@ commands:
 `pack` writes one ZIP per skill into OUT_DIR, named <skill-name>.zip. Each
 holds exactly that one folder, under its skill name and without the
 category, which is the shape claude.ai and Claude Desktop take as an upload.
-Next to them goes skills.json, an index with each skill's header, download
-links, size and SHA-256. --version names the release the links point to.
+With --version every ZIP is also written as <skill-name>-X.Y.Z.zip, with the
+same bytes: the name without a version keeps the link to the newest release
+stable, the one with it shows on disk which version it is. Next to them goes
+skills.json, an index with each skill's header, download links, size and
+SHA-256. --version names the release the links point to.
 
 `marketplace` writes .claude-plugin/marketplace.json, through which Claude
 Code installs every skill as a plugin of its own, from the release tag of the
@@ -227,9 +230,13 @@ def pack(out_dir: Path, version: str | None) -> None:
         target = out_dir / f"{skill.name}.zip"
         count = pack_one(skill, target)
         data = target.read_bytes()
+        written = [target.name]
         url = f"{latest}/{target.name}"
         if version:
-            url = f"{REPOSITORY_URL}/releases/download/v{version}/{target.name}"
+            versioned = out_dir / f"{skill.name}-{version}.zip"
+            versioned.write_bytes(data)
+            written.append(versioned.name)
+            url = f"{REPOSITORY_URL}/releases/download/v{version}/{versioned.name}"
         index.append(
             {
                 "name": skill.name,
@@ -243,7 +250,7 @@ def pack(out_dir: Path, version: str | None) -> None:
                 "sha256": hashlib.sha256(data).hexdigest(),
             }
         )
-        print(f"{skill.path}: {count} files -> {target.name}")
+        print(f"{skill.path}: {count} files -> {', '.join(written)}")
     document = {"repository": REPOSITORY_URL, "version": version, "skills": index}
     write_json(out_dir / "skills.json", document)
     print(f"index: {len(index)} skills -> skills.json")
@@ -404,7 +411,10 @@ def main() -> None:
     commands = parser.add_subparsers(dest="command", required=True)
     pack_parser = commands.add_parser("pack", help="write the ZIPs and skills.json")
     pack_parser.add_argument("out_dir", type=Path)
-    pack_parser.add_argument("--version", help="the release X.Y.Z the index links to")
+    pack_parser.add_argument(
+        "--version",
+        help="the release X.Y.Z, also written into a second name of every ZIP",
+    )
     market_parser = commands.add_parser(
         "marketplace", help="write .claude-plugin/marketplace.json"
     )

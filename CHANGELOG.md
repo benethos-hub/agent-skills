@@ -17,6 +17,10 @@ The newest version below is the one the next release must carry. Every
 
 ### Changed
 
+- A release carries each skill twice, with the same bytes:
+  `<skill-name>.zip` for the stable link to the newest release and
+  `<skill-name>-X.Y.Z.zip`, which shows on disk which version it is.
+  `skills.json` links the versioned name as the fixed one.
 - CI runs the shared checks of the organisation: lint with Ruff and Mypy, the
   tests on Python 3.11 to 3.15 with a coverage floor of 80 percent, and an
   audit of the locked tools. The release uploads nothing unless CI passed on

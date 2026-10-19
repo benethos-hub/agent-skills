@@ -78,6 +78,11 @@ release and as a plugin of its own:
 | asset-analysis | [asset-analysis.zip](https://github.com/benethos-hub/agent-skills/releases/latest/download/asset-analysis.zip) | `claude plugin install asset-analysis@benethos-agent-skills` |
 | dividend-calendar | [dividend-calendar.zip](https://github.com/benethos-hub/agent-skills/releases/latest/download/dividend-calendar.zip) | `claude plugin install dividend-calendar@benethos-agent-skills` |
 
+The links always reach the newest release. Every release on the
+[releases page](https://github.com/benethos-hub/agent-skills/releases) also
+carries each ZIP under a name with its version, `<skill-name>-X.Y.Z.zip`, for
+a fixed version.
+
 In claude.ai and Claude Desktop, upload the ZIP in the settings under Skills.
 Other agents and updates are covered under
 [Installing](../../README.md#installing) in the main README.
