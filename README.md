@@ -115,7 +115,10 @@ the newest release again and replace the old one.
 
 ## Maintaining
 
-This part is for whoever changes the repository.
+This part is for whoever changes the repository. Everything here runs with
+[uv](https://docs.astral.sh/uv/getting-started/installation/). The test tools
+are locked in `uv.lock`, and `.github/scripts/skills.py` needs the standard
+library only.
 
 ### Releases
 
@@ -125,7 +128,7 @@ release takes five steps:
 
 1. Move the entries under `[Unreleased]` into a new version section.
 2. Regenerate the marketplace file, which points Claude Code to the new tag:
-   `python3 .github/scripts/skills.py marketplace`.
+   `uv run .github/scripts/skills.py marketplace`.
 3. Run the tests. They name every `vX.Y.Z` in a Markdown file that does not
    match the new version yet. Update those lines.
 4. Merge into `main` through a pull request.
@@ -135,11 +138,12 @@ release takes five steps:
 
    ```bash
    gh release create v0.2.0 --target main \
-     --notes "$(python3 .github/scripts/skills.py version --notes)"
+     --notes "$(uv run .github/scripts/skills.py version --notes)"
    ```
 
-The release workflow then checks that the tag is the version in the
-changelog and runs the tests. Only then does it attach one file per skill,
+The release workflow then checks, through the organisation's gate, that CI
+passed on the release commit on `main`, and that the tag is the version in
+the changelog. Only then does it attach one file per skill,
 `<skill-name>.zip`, and next to them `skills.json`, an index with each skill's
 name, category, description, links, size and SHA-256. GitHub keeps the files
 of every release under its tag, so a fixed version stays reachable:
@@ -154,9 +158,9 @@ The archives are build results and are never checked in.
 
 Claude Code looks for the marketplace in one fixed place,
 `.claude-plugin/marketplace.json`. Adding the marketplace clones the
-repository and reads that file. Its
-`name` field, `benethos-agent-skills`, is the part after the `@` in every
-install command. The repository's name plays no part there.
+repository and reads that file. Its `name` field, `benethos-agent-skills`, is
+the part after the `@` in every install command. The repository's name plays
+no part there.
 
 The file is read from `main`. Each plugin in it takes its files from the
 release tag it names. That is why the file has to name the new tag before a
@@ -170,13 +174,18 @@ the file no longer matches the skills.
 
 ### Tests
 
-The tests use only the Python standard library and run on every push:
+CI runs the shared checks of the organisation on every push and pull
+request, from `benethos-hub/.github`: lint, the tests on Python 3.11 to 3.15,
+an audit of `uv.lock` and the brand check. Next to them it packs every skill.
+Locally the same runs with:
 
 ```bash
-python3 -m unittest discover -s tests -v
+uv run pytest                                 # the tests
+uv run ruff check . && uv run ruff format --check . && uv run mypy   # lint
 ```
 
-They check:
+The newest Python version also measures the coverage of
+`.github/scripts/skills.py`, with a floor of 80 percent. The tests check:
 
 - **Layout.** `skills/` holds only categories, and every `SKILL.md` lies in
   one of them. Every category has a README and holds only skill folders. Every
@@ -192,13 +201,16 @@ They check:
   is its newest version.
 - **Delivery.** The ZIPs hold one folder each and leave out test material, the
   index matches them, and the same content gives the same bytes on every
-  machine. The workflows pin every action to a commit, except the shared
-  workflows of the organisation, which follow its `main`.
+  machine. The workflows run Python through uv and pin every action to a
+  commit, except the shared workflows of the organisation, which follow its
+  `main`.
+- **Command line.** `skills.py` packs, writes and checks the marketplace file
+  and names the version as the workflows and this README call it.
 
 External links are only fetched on request, because that needs the network:
 
 ```bash
-LINKS_ONLINE=1 python3 -m unittest discover -s tests -v
+LINKS_ONLINE=1 uv run pytest
 ```
 
 ### Layout
@@ -208,6 +220,8 @@ agent-skills/
   README.md
   CHANGELOG.md        # the version and what changed
   LICENSE
+  pyproject.toml      # the test tools and their settings, no package
+  uv.lock             # the locked test tools, kept current by Dependabot
   assets/
     brand/            # icon.svg, icon.png 512x512, social-preview.png 1280x640
     render_brand.py   # draws both PNGs from icon.svg: uv run assets/render_brand.py
@@ -216,7 +230,7 @@ agent-skills/
   .github/
     scripts/skills.py # checks the skills, packs the ZIPs, writes both JSON files
     workflows/        # CI on every push, the release assets on every release
-  tests/              # the checks above, standard library only
+  tests/              # the checks above, run with uv run pytest
   skills/
     <category>/
       README.md       # the category's skills, what they need, the setup
@@ -240,7 +254,7 @@ agent-skills/
 - The category's README lists the skill and names what it needs to give a
   useful answer.
 - After adding, renaming or changing the header of a skill, regenerate the
-  marketplace file with `python3 .github/scripts/skills.py marketplace`.
+  marketplace file with `uv run .github/scripts/skills.py marketplace`.
 - English, no semicolons, no emojis. The answer follows the user's language.
 - Gaps in the data are named, not covered up. The skill says what it does not
   do, and the category's README carries the disclaimer for its field.

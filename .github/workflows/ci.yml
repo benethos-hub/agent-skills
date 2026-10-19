@@ -1,8 +1,13 @@
 name: CI
 
-# Runs the tests and packs every skill the way a release would, so a broken
-# header, a dead link or a stale version number shows on the push and not
-# only when a release is published.
+# Runs the organisation's shared checks and packs every skill the way a
+# release would, so a broken header, a dead link or a stale version number
+# shows on the push and not only when a release is published.
+#
+# lint, test, audit and brand come from benethos-hub/.github and follow its
+# main, so a change to a shared rule reaches every repository at once. The
+# tools of lint and test are locked in uv.lock, their settings live in
+# pyproject.toml.
 
 on:
   push:
@@ -15,6 +20,19 @@ permissions:
   contents: read
 
 jobs:
+  # uv.lock in step with pyproject.toml, Ruff, the formatting and Mypy.
+  lint:
+    uses: benethos-hub/.github/.github/workflows/python-lint.yml@main
+
+  # The tests on every supported Python version, the coverage of
+  # .github/scripts on the newest with a floor of 80 percent.
+  test:
+    uses: benethos-hub/.github/.github/workflows/python-tests.yml@main
+
+  # No known vulnerability in any version uv.lock pins.
+  audit:
+    uses: benethos-hub/.github/.github/workflows/python-dependency-audit.yml@main
+
   package:
     name: Check and pack the skills
     runs-on: ubuntu-latest
@@ -24,11 +42,15 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Tests
-        run: python3 -m unittest discover -s tests -v
+      # skills.py needs the standard library only, so there is nothing to
+      # cache. uv provides the Python its header asks for.
+      - name: Install uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: false
 
       - name: Check and pack
-        run: python3 .github/scripts/skills.py pack "$RUNNER_TEMP/skills"
+        run: uv run .github/scripts/skills.py pack "$RUNNER_TEMP/skills"
 
       - name: List the archives and the index
         run: |
@@ -39,8 +61,6 @@ jobs:
           done
           cat "$RUNNER_TEMP/skills/skills.json"
 
-  # The organisation's check that assets/brand holds icon.svg and a 512x512
-  # icon.png not older than the SVG. It follows main on purpose, so a change
-  # to the brand rules reaches every repository at once.
+  # assets/brand holds icon.svg and a 512x512 icon.png not older than the SVG.
   brand:
     uses: benethos-hub/.github/.github/workflows/brand.yml@main

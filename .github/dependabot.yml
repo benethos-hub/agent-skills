@@ -1,8 +1,20 @@
 version: 2
-# The workflows pin every action to a full commit SHA, with the version it
-# stands for in a trailing comment. A tag is a pointer its owner can move, a
-# SHA cannot. Dependabot reads the comment and raises SHA and comment together.
 updates:
+  # The test tools locked in uv.lock: pytest, pytest-cov, Ruff and Mypy. The
+  # ecosystem is "uv", not "pip", because uv.lock decides what is installed.
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  # The workflows pin every action to a full commit SHA, with the version it
+  # stands for in a trailing comment. A tag is a pointer its owner can move, a
+  # SHA cannot. Dependabot reads the comment and raises SHA and comment
+  # together.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

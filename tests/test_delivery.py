@@ -8,6 +8,7 @@ import hashlib
 import io
 import json
 import re
+import sys
 import tempfile
 import unittest
 import zipfile
@@ -17,6 +18,14 @@ from unittest import mock
 from support import ROOT, categories, rel, skill_folders, skills
 
 MARKETPLACE = skills.MARKETPLACE_NAME
+
+
+def header(name: str, description: str | None = None) -> str:
+    """A closed SKILL.md header with a name and, if given, a description."""
+    lines = ["---", f"name: {name}"]
+    if description is not None:
+        lines.append(f"description: {description}")
+    return "\n".join([*lines, "---", ""])
 
 
 def pack(out_dir: Path, version: str | None = None) -> None:
@@ -33,7 +42,9 @@ class PackTest(unittest.TestCase):
 
     def test_one_zip_per_skill_and_the_index(self):
         written = sorted(p.name for p in self.tmp.iterdir())
-        self.assertEqual(written, sorted([f"{n}.zip" for n in self.names] + ["skills.json"]))
+        self.assertEqual(
+            written, sorted([f"{n}.zip" for n in self.names] + ["skills.json"])
+        )
 
     def test_zip_holds_one_folder_with_skill_md(self):
         for name in self.names:
@@ -41,7 +52,9 @@ class PackTest(unittest.TestCase):
                 entries = archive.namelist()
             with self.subTest(skill=name):
                 self.assertIn(f"{name}/SKILL.md", entries)
-                self.assertEqual([e for e in entries if not e.startswith(f"{name}/")], [])
+                self.assertEqual(
+                    [e for e in entries if not e.startswith(f"{name}/")], []
+                )
 
     def test_index_matches_the_archives(self):
         self.assertEqual(self.index["version"], "9.9.9")
@@ -51,8 +64,16 @@ class PackTest(unittest.TestCase):
             with self.subTest(skill=entry["name"]):
                 self.assertEqual(entry["sha256"], hashlib.sha256(data).hexdigest())
                 self.assertEqual(entry["size"], len(data))
-                self.assertTrue(entry["url"].endswith(f"/releases/download/v9.9.9/{entry['name']}.zip"))
-                self.assertTrue(entry["latest_url"].endswith(f"/releases/latest/download/{entry['name']}.zip"))
+                self.assertTrue(
+                    entry["url"].endswith(
+                        f"/releases/download/v9.9.9/{entry['name']}.zip"
+                    )
+                )
+                self.assertTrue(
+                    entry["latest_url"].endswith(
+                        f"/releases/latest/download/{entry['name']}.zip"
+                    )
+                )
                 self.assertTrue((ROOT / entry["path"] / "SKILL.md").is_file())
 
     def test_entries_are_stored_uncompressed(self):
@@ -71,7 +92,10 @@ class PackTest(unittest.TestCase):
         pack(again, "9.9.9")
         for name in self.names:
             with self.subTest(skill=name):
-                self.assertEqual((self.tmp / f"{name}.zip").read_bytes(), (again / f"{name}.zip").read_bytes())
+                self.assertEqual(
+                    (self.tmp / f"{name}.zip").read_bytes(),
+                    (again / f"{name}.zip").read_bytes(),
+                )
 
 
 class PackRulesTest(unittest.TestCase):
@@ -87,7 +111,10 @@ class PackRulesTest(unittest.TestCase):
 
     def problems(self, root: Path) -> str:
         stderr = io.StringIO()
-        with mock.patch.object(skills, "ROOT", root), contextlib.redirect_stderr(stderr):
+        with (
+            mock.patch.object(skills, "ROOT", root),
+            contextlib.redirect_stderr(stderr),
+        ):
             with self.assertRaises(SystemExit):
                 skills.load_skills()
         return stderr.getvalue()
@@ -95,13 +122,13 @@ class PackRulesTest(unittest.TestCase):
     def test_broken_headers_are_rejected(self):
         root = self.make_repo(
             {
-                "skills/a/good-one/SKILL.md": "---\nname: good-one\ndescription: fine\n---\n",
-                "skills/a/Bad_Name/SKILL.md": "---\nname: Bad_Name\ndescription: x\n---\n",
-                "skills/a/other/SKILL.md": "---\nname: different\ndescription: x\n---\n",
-                "skills/a/no-description/SKILL.md": "---\nname: no-description\n---\n",
-                "skills/a/too-long/SKILL.md": f"---\nname: too-long\ndescription: {'x' * 1025}\n---\n",
+                "skills/a/good-one/SKILL.md": header("good-one", "fine"),
+                "skills/a/Bad_Name/SKILL.md": header("Bad_Name", "x"),
+                "skills/a/other/SKILL.md": header("different", "x"),
+                "skills/a/no-description/SKILL.md": header("no-description"),
+                "skills/a/too-long/SKILL.md": header("too-long", "x" * 1025),
                 "skills/a/open-header/SKILL.md": "---\nname: open-header\n",
-                "skills/b/good-one/SKILL.md": "---\nname: good-one\ndescription: twin\n---\n",
+                "skills/b/good-one/SKILL.md": header("good-one", "twin"),
             }
         )
         report = self.problems(root)
@@ -133,7 +160,10 @@ class PackRulesTest(unittest.TestCase):
             pack(out)
         with zipfile.ZipFile(out / "kept.zip") as archive:
             entries = sorted(archive.namelist())
-        self.assertEqual(entries, ["kept/SKILL.md", "kept/references/notes.md", "kept/scripts/tool.py"])
+        self.assertEqual(
+            entries,
+            ["kept/SKILL.md", "kept/references/notes.md", "kept/scripts/tool.py"],
+        )
 
 
 class MarketplaceTest(unittest.TestCase):
@@ -142,12 +172,16 @@ class MarketplaceTest(unittest.TestCase):
         self.document = json.loads(self.path.read_text(encoding="utf-8"))
 
     def test_file_is_current(self):
-        number, _ = skills.current_version((ROOT / "CHANGELOG.md").read_text(encoding="utf-8"))
-        expected = skills.to_json(skills.marketplace_document(skills.load_skills(), number))
+        number, _ = skills.current_version(
+            (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        )
+        expected = skills.to_json(
+            skills.marketplace_document(skills.load_skills(), number)
+        )
         self.assertEqual(
             self.path.read_text(encoding="utf-8"),
             expected,
-            "run: python3 .github/scripts/skills.py marketplace",
+            "run: uv run .github/scripts/skills.py marketplace",
         )
 
     def test_every_skill_is_a_plugin(self):
@@ -156,12 +190,18 @@ class MarketplaceTest(unittest.TestCase):
             for folder in skill_folders(category):
                 with self.subTest(skill=folder.name):
                     self.assertIn(folder.name, plugins)
-                    self.assertEqual(plugins[folder.name]["skills"], [f"./{rel(folder)}"])
+                    self.assertEqual(
+                        plugins[folder.name]["skills"], [f"./{rel(folder)}"]
+                    )
                     self.assertEqual(plugins[folder.name]["category"], category.name)
 
     def test_skills_come_from_the_current_release(self):
-        number, _ = skills.current_version((ROOT / "CHANGELOG.md").read_text(encoding="utf-8"))
-        names = {f.name for c in categories() for f in skill_folders(c)} | {c.name for c in categories()}
+        number, _ = skills.current_version(
+            (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        )
+        names = {f.name for c in categories() for f in skill_folders(c)} | {
+            c.name for c in categories()
+        }
         for plugin in self.document["plugins"]:
             if plugin["name"] not in names:
                 continue
@@ -179,7 +219,9 @@ class MarketplaceTest(unittest.TestCase):
             with self.subTest(category=category.name):
                 self.assertIn(category.name, plugins)
                 bundle = plugins[category.name]
-                self.assertEqual(bundle["skills"], [f"./{rel(f)}" for f in skill_folders(category)])
+                self.assertEqual(
+                    bundle["skills"], [f"./{rel(f)}" for f in skill_folders(category)]
+                )
                 expected = {k: v for p in servers for k, v in p["mcpServers"].items()}
                 self.assertEqual(bundle.get("mcpServers", {}), expected)
 
@@ -197,10 +239,18 @@ class ReadmeTest(unittest.TestCase):
         listed = {}
         for row in rows:
             match = re.match(r"\| \[[^\]]+\]\(skills/([^/]+)/README\.md\)", row)
-            self.assertIsNotNone(match, f"the row does not start with a link to skills/<category>/README.md: {row}")
+            self.assertIsNotNone(
+                match,
+                "the row does not start with a link to "
+                f"skills/<category>/README.md: {row}",
+            )
             category = match.group(1)
-            listed[category] = sorted(re.findall(rf"\]\(skills/{category}/([^/]+)/SKILL\.md\)", row))
-        expected = {c.name: sorted(f.name for f in skill_folders(c)) for c in categories()}
+            listed[category] = sorted(
+                re.findall(rf"\]\(skills/{category}/([^/]+)/SKILL\.md\)", row)
+            )
+        expected = {
+            c.name: sorted(f.name for f in skill_folders(c)) for c in categories()
+        }
         self.assertEqual(listed, expected)
 
     def test_category_readme_names_every_skill(self):
@@ -209,21 +259,37 @@ class ReadmeTest(unittest.TestCase):
             for folder in skill_folders(category):
                 name = folder.name
                 with self.subTest(skill=name):
-                    self.assertIn(f"]({name}/SKILL.md)", text, "no link to the SKILL.md")
-                    self.assertIn(f"/releases/latest/download/{name}.zip", text, "no download link")
-                    self.assertIn(f"claude plugin install {name}@{MARKETPLACE}", text, "no install command")
+                    self.assertIn(
+                        f"]({name}/SKILL.md)", text, "no link to the SKILL.md"
+                    )
+                    self.assertIn(
+                        f"/releases/latest/download/{name}.zip",
+                        text,
+                        "no download link",
+                    )
+                    self.assertIn(
+                        f"claude plugin install {name}@{MARKETPLACE}",
+                        text,
+                        "no install command",
+                    )
 
     def test_category_readme_names_its_bundle(self):
         for category in categories():
             text = (category / "README.md").read_text(encoding="utf-8")
             with self.subTest(category=category.name):
-                self.assertIn(f"claude plugin install {category.name}@{MARKETPLACE}", text)
+                self.assertIn(
+                    f"claude plugin install {category.name}@{MARKETPLACE}", text
+                )
 
     def test_category_readme_names_its_mcp_plugins(self):
         for plugin in skills.MCP_PLUGINS:
-            text = (ROOT / "skills" / plugin["category"] / "README.md").read_text(encoding="utf-8")
+            text = (ROOT / "skills" / plugin["category"] / "README.md").read_text(
+                encoding="utf-8"
+            )
             with self.subTest(plugin=plugin["name"]):
-                self.assertIn(f"claude plugin install {plugin['name']}@{MARKETPLACE}", text)
+                self.assertIn(
+                    f"claude plugin install {plugin['name']}@{MARKETPLACE}", text
+                )
 
 
 class WorkflowTest(unittest.TestCase):
@@ -232,7 +298,9 @@ class WorkflowTest(unittest.TestCase):
 
     def test_actions_are_pinned_to_a_commit(self):
         for path in self.workflows:
-            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            for number, line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), start=1
+            ):
                 match = re.search(r"uses:\s*(\S+)", line)
                 if not match or match.group(1).startswith("./"):
                     continue
@@ -241,18 +309,80 @@ class WorkflowTest(unittest.TestCase):
                 if match.group(1).startswith("benethos-hub/.github/.github/workflows/"):
                     continue
                 with self.subTest(line=f"{rel(path)}:{number}"):
-                    self.assertRegex(line, r"@[0-9a-f]{40} # v\d", "pin to a full SHA with the version as comment")
+                    self.assertRegex(
+                        line,
+                        r"@[0-9a-f]{40} # v\d",
+                        "pin to a full SHA with the version as comment",
+                    )
 
     def test_workflows_limit_the_token(self):
         for path in self.workflows:
             with self.subTest(workflow=rel(path)):
-                self.assertRegex(path.read_text(encoding="utf-8"), r"(?m)^permissions:\n  contents: read$")
+                self.assertRegex(
+                    path.read_text(encoding="utf-8"),
+                    r"(?m)^permissions:\n  contents: read$",
+                )
 
     def test_workflows_run_existing_scripts(self):
+        # Every path of a Python file in this repository a workflow names.
+        script = re.compile(r"(?<![\w/.-])((?:\.github|assets|tests)/[\w./-]+\.py)")
         for path in self.workflows:
-            for script in re.findall(r"python3 (\S+\.py)", path.read_text(encoding="utf-8")):
-                with self.subTest(workflow=rel(path), script=script):
-                    self.assertTrue((ROOT / script).is_file())
+            for name in script.findall(path.read_text(encoding="utf-8")):
+                with self.subTest(workflow=rel(path), script=name):
+                    self.assertTrue((ROOT / name).is_file())
+
+    def test_workflows_run_python_through_uv(self):
+        for path in self.workflows:
+            text = path.read_text(encoding="utf-8")
+            with self.subTest(workflow=rel(path)):
+                self.assertNotRegex(text, r"(?m)^\s*run: python3? ", "use uv run")
+
+
+class CommandLineTest(unittest.TestCase):
+    """skills.py as the workflows and the README call it."""
+
+    def run_main(self, *args: str) -> str:
+        out = io.StringIO()
+        with (
+            mock.patch.object(sys, "argv", ["skills.py", *args]),
+            contextlib.redirect_stdout(out),
+        ):
+            skills.main()
+        return out.getvalue()
+
+    def test_version(self):
+        number, _ = skills.current_version(
+            (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        )
+        self.assertEqual(self.run_main("version"), f"{number}\n")
+        self.assertEqual(self.run_main("version", "--tag", f"v{number}"), f"{number}\n")
+        self.assertTrue(self.run_main("version", "--notes").strip())
+
+    def test_version_rejects_another_tag(self):
+        with self.assertRaises(SystemExit):
+            self.run_main("version", "--tag", "v0.0.0")
+
+    def test_marketplace_check_passes(self):
+        self.assertIn("matches the skills", self.run_main("marketplace", "--check"))
+
+    def test_marketplace_writes_what_it_checks(self):
+        # A missing file fails the check, the written one passes it and equals
+        # the file in the repository.
+        target = Path(tempfile.mkdtemp()) / ".claude-plugin" / "marketplace.json"
+        with mock.patch.object(skills, "MARKETPLACE_FILE", target):
+            with self.assertRaises(SystemExit):
+                self.run_main("marketplace", "--check")
+            self.run_main("marketplace")
+            self.assertIn("matches the skills", self.run_main("marketplace", "--check"))
+        committed = ROOT / ".claude-plugin" / "marketplace.json"
+        self.assertEqual(
+            target.read_text(encoding="utf-8"), committed.read_text(encoding="utf-8")
+        )
+
+    def test_pack(self):
+        out = Path(tempfile.mkdtemp())
+        self.run_main("pack", str(out), "--version", "9.9.9")
+        self.assertTrue((out / "skills.json").is_file())
 
 
 if __name__ == "__main__":

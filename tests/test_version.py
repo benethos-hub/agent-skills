@@ -24,7 +24,9 @@ class ChangelogTest(unittest.TestCase):
     def test_has_unreleased_section_first(self):
         sections = re.findall(r"^## (.+)$", changelog(), re.MULTILINE)
         self.assertTrue(sections, "CHANGELOG.md has no sections")
-        self.assertEqual(sections[0], "[Unreleased]", "the first section is [Unreleased]")
+        self.assertEqual(
+            sections[0], "[Unreleased]", "the first section is [Unreleased]"
+        )
 
     def test_every_version_section_has_the_form(self):
         sections = re.findall(r"^## (.+)$", changelog(), re.MULTILINE)[1:]
@@ -36,7 +38,9 @@ class ChangelogTest(unittest.TestCase):
         found = skills.VERSION_HEADING.findall(changelog())
         self.assertTrue(found, "CHANGELOG.md names no version")
         numbers = [tuple(int(n) for n in number.split(".")) for number, _ in found]
-        self.assertEqual(numbers, sorted(numbers, reverse=True), "newest version first, no repeats")
+        self.assertEqual(
+            numbers, sorted(numbers, reverse=True), "newest version first, no repeats"
+        )
         self.assertEqual(len(numbers), len(set(numbers)), "a version appears twice")
         dates = [datetime.date.fromisoformat(date) for _, date in found]
         self.assertEqual(dates, sorted(dates, reverse=True), "newest date first")
@@ -48,13 +52,16 @@ class VersionInTextTest(unittest.TestCase):
         for path in markdown_files():
             if path.name == "CHANGELOG.md":
                 continue
-            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            for number, line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), start=1
+            ):
                 for found in VERSION_IN_TEXT.findall(line):
                     with self.subTest(line=f"{rel(path)}:{number}"):
                         self.assertEqual(
                             found,
                             current,
-                            f"v{found} is not v{current}, the newest version in CHANGELOG.md",
+                            f"v{found} is not v{current}, "
+                            "the newest version in CHANGELOG.md",
                         )
 
 
@@ -67,7 +74,10 @@ class VersionCommandTest(unittest.TestCase):
 
     def run_version(self, tag=None, notes=False) -> str:
         out = io.StringIO()
-        with mock.patch.object(skills.Path, "read_text", return_value=self.SAMPLE), contextlib.redirect_stdout(out):
+        with (
+            mock.patch.object(skills.Path, "read_text", return_value=self.SAMPLE),
+            contextlib.redirect_stdout(out),
+        ):
             skills.version(tag, notes)
         return out.getvalue()
 
