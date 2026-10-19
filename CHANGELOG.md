@@ -9,6 +9,12 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+### Added
+
+- The README opens with the badge rows of the organisation: CI, coverage and
+  licence, the latest release, and the sponsor links. CI writes the coverage
+  badge on every push to `main`, to the branch `badges`.
+
 ### Changed
 
 - CI runs the shared checks of the organisation: lint with Ruff and Mypy, the

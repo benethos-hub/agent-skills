@@ -25,9 +25,22 @@ jobs:
     uses: benethos-hub/.github/.github/workflows/python-lint.yml@main
 
   # The tests on every supported Python version, the coverage of
-  # .github/scripts on the newest with a floor of 80 percent.
+  # .github/scripts on the newest with a floor of 80 percent. That run also
+  # writes the coverage as a badge for the job coverage-badge.
   test:
     uses: benethos-hub/.github/.github/workflows/python-tests.yml@main
+    with:
+      badge: true
+
+  # The README's coverage badge shows main, so it is written on a push only.
+  # It commits coverage.json to the branch badges, which it creates on its
+  # first run. Never a required check, a pull request does not run it.
+  coverage-badge:
+    if: github.event_name == 'push'
+    needs: test
+    uses: benethos-hub/.github/.github/workflows/coverage-badge.yml@main
+    permissions:
+      contents: write
 
   # No known vulnerability in any version uv.lock pins.
   audit:

@@ -233,6 +233,24 @@ class MarketplaceTest(unittest.TestCase):
 class ReadmeTest(unittest.TestCase):
     """The READMEs name every skill and every way to get it."""
 
+    def test_root_readme_opens_with_the_badge_rows(self):
+        # The rule of the organisation: CI, coverage and licence, then where
+        # to get it, then the sponsor links, each row apart by a blank line.
+        lines = (ROOT / "README.md").read_text(encoding="utf-8").splitlines()
+        badges = [line.split("]")[0] for line in lines[2:11] if line]
+        self.assertEqual(
+            badges,
+            [
+                "[![CI",
+                "[![Coverage",
+                "[![License",
+                "[![Release",
+                "[![Sponsor",
+                "[![PayPal",
+            ],
+        )
+        self.assertEqual([lines[5], lines[7], lines[10]], ["", "", ""])
+
     def test_root_readme_lists_every_category_and_skill(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8")
         rows = [line for line in text.splitlines() if line.startswith("| [")]
