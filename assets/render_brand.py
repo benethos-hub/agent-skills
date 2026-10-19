@@ -128,14 +128,18 @@ def _pattern() -> str:
         '<linearGradient id="pt-fade" x1="0" y1="0" x2="1" y2="0">'
         '<stop offset="0.25" stop-color="#FFFFFF" stop-opacity="0"/>'
         '<stop offset="1" stop-color="#FFFFFF" stop-opacity="1"/></linearGradient>'
-        '<mask id="pt-mask"><rect width="1280" height="640" fill="url(#pt-fade)"/></mask>'
+        '<mask id="pt-mask">'
+        '<rect width="1280" height="640" fill="url(#pt-fade)"/></mask>'
         "</defs>"
     )
     glows = (
         '<ellipse cx="200" cy="320" rx="360" ry="300" fill="url(#pt-violet)"/>'
         '<ellipse cx="1120" cy="600" rx="420" ry="260" fill="url(#pt-cyan)"/>'
     )
-    dots = '<rect width="1280" height="640" fill="url(#pt-dots)" opacity="0.22" mask="url(#pt-mask)"/>'
+    dots = (
+        '<rect width="1280" height="640" fill="url(#pt-dots)" opacity="0.22" '
+        'mask="url(#pt-mask)"/>'
+    )
     traces = ['<g fill="none" stroke="#22D3EE" stroke-width="2" opacity="0.16">']
     for points in TRACES:
         line = " ".join(f"{x},{y}" for x, y in points)
@@ -164,7 +168,8 @@ def _backdrop(x: int, bottom: int, width: int, opacity: float) -> str:
     for i, (key, value) in enumerate(BACKDROP_LINES):
         parts.append(
             f'<text x="{x + 28}" y="{first_line + 28 * i}" xml:space="preserve">'
-            f'<tspan fill="#7C6BFF">{key}</tspan><tspan fill="#22D3EE">{value}</tspan></text>'
+            f'<tspan fill="#7C6BFF">{key}</tspan>'
+            f'<tspan fill="#22D3EE">{value}</tspan></text>'
         )
     parts.append("</g></g>")
     return "".join(parts)

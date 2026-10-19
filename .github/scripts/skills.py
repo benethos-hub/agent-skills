@@ -1,11 +1,15 @@
+# /// script
+# requires-python = ">=3.11"
+# dependencies = []
+# ///
 """Check the skills in this repository and build what is delivered from them.
 
 A skill is a folder skills/<category>/<skill-name>/ with a SKILL.md. Three
 commands:
 
-    python3 .github/scripts/skills.py pack OUT_DIR [--version X.Y.Z]
-    python3 .github/scripts/skills.py marketplace [--check]
-    python3 .github/scripts/skills.py version [--tag vX.Y.Z] [--notes]
+    uv run .github/scripts/skills.py pack OUT_DIR [--version X.Y.Z]
+    uv run .github/scripts/skills.py marketplace [--check]
+    uv run .github/scripts/skills.py version [--tag vX.Y.Z] [--notes]
 
 `pack` writes one ZIP per skill into OUT_DIR, named <skill-name>.zip. Each
 holds exactly that one folder, under its skill name and without the
@@ -26,7 +30,9 @@ version's section instead, as release notes.
 
 `pack` and `marketplace` check every skill first and stop with a list of
 problems if one fails.
-Only the standard library is used, so the script runs on a bare runner.
+
+Only the standard library is used. The header above tells uv so, and uv run
+starts the script without the tools of pyproject.toml.
 """
 
 from __future__ import annotations
@@ -40,20 +46,23 @@ import sys
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 REPOSITORY = os.environ.get("GITHUB_REPOSITORY", "benethos-hub/agent-skills")
 REPOSITORY_URL = f"https://github.com/{REPOSITORY}"
 MARKETPLACE_FILE = ROOT / ".claude-plugin" / "marketplace.json"
 CHANGELOG_FILE = ROOT / "CHANGELOG.md"
-VERSION_HEADING = re.compile(r"^## \[(\d+\.\d+\.\d+)\] - (\d{4}-\d{2}-\d{2})$", re.MULTILINE)
+VERSION_HEADING = re.compile(
+    r"^## \[(\d+\.\d+\.\d+)\] - (\d{4}-\d{2}-\d{2})$", re.MULTILINE
+)
 MARKETPLACE_NAME = "benethos-agent-skills"
 OWNER = "Benedikt Oswald"
 
 # MCP servers the marketplace offers next to the skills, each as a plugin of
 # its own. Claude Code only, a ZIP cannot carry a server. No skill depends on
 # them, because the skills work with any provider of the same data.
-MCP_PLUGINS = [
+MCP_PLUGINS: list[dict[str, Any]] = [
     {
         "name": "benethos-yahoo-finance-mcp",
         "description": (
@@ -164,9 +173,12 @@ def load_skills() -> list[Skill]:
                 f"{where}: description has {len(description)} characters, "
                 f"at most {DESCRIPTION_MAX} are allowed"
             )
-        # ZIPs and plugins carry the skill name only, so two categories cannot share one.
+        # ZIPs and plugins carry the skill name only, so two categories cannot
+        # share one.
         if folder.name in seen:
-            problems.append(f"{where}: the skill name is already used by {seen[folder.name]}")
+            problems.append(
+                f"{where}: the skill name is already used by {seen[folder.name]}"
+            )
         seen[folder.name] = where
         skills.append(Skill(folder, header))
     if problems:
@@ -186,7 +198,11 @@ def included(path: Path, folder: Path) -> bool:
 
 def pack_one(skill: Skill, target: Path) -> int:
     files = sorted(
-        (p for p in skill.folder.rglob("*") if p.is_file() and included(p, skill.folder)),
+        (
+            p
+            for p in skill.folder.rglob("*")
+            if p.is_file() and included(p, skill.folder)
+        ),
         key=lambda p: p.relative_to(skill.folder).as_posix(),
     )
     with zipfile.ZipFile(target, "w", zipfile.ZIP_STORED) as archive:
@@ -263,10 +279,15 @@ def marketplace_document(skills: list[Skill], version: str) -> dict[str, object]
     # command.
     release = {"source": "url", "url": f"{REPOSITORY_URL}.git", "ref": f"v{version}"}
     categories = sorted({skill.category for skill in skills})
-    names = [skill.name for skill in skills] + categories + [p["name"] for p in MCP_PLUGINS]
+    names = (
+        [skill.name for skill in skills] + categories + [p["name"] for p in MCP_PLUGINS]
+    )
     taken = sorted({name for name in names if names.count(name) > 1})
     if taken:
-        sys.exit(f"Plugin names used twice by skills, categories or MCP servers: {', '.join(taken)}")
+        sys.exit(
+            "Plugin names used twice by skills, categories or MCP servers: "
+            + ", ".join(taken)
+        )
 
     plugins: list[dict[str, object]] = [
         {
@@ -285,13 +306,15 @@ def marketplace_document(skills: list[Skill], version: str) -> dict[str, object]
     for category in categories:
         members = [skill for skill in skills if skill.category == category]
         servers = [p for p in MCP_PLUGINS if p["category"] == category]
-        with_servers = ""
+        description = f"Every {category} skill in one plugin"
         if servers:
+            noun = "servers" if len(servers) > 1 else "server"
             listed = ", ".join(p["name"] for p in servers)
-            with_servers = f", with the MCP server{'s' if len(servers) > 1 else ''} {listed} for the data"
+            description += f", with the MCP {noun} {listed} for the data"
+        description += f". {category_summary(category)}"
         bundle: dict[str, object] = {
             "name": category,
-            "description": f"Every {category} skill in one plugin{with_servers}. {category_summary(category)}",
+            "description": description,
             "version": version,
             "source": release,
             "strict": False,
@@ -303,7 +326,9 @@ def marketplace_document(skills: list[Skill], version: str) -> dict[str, object]
         bundle["repository"] = REPOSITORY_URL
         bundle["skills"] = [f"./{skill.path}" for skill in members]
         if servers:
-            bundle["mcpServers"] = {k: v for p in servers for k, v in p["mcpServers"].items()}
+            bundle["mcpServers"] = {
+                k: v for p in servers for k, v in p["mcpServers"].items()
+            }
         plugins.append(bundle)
     plugins += [{**plugin, "source": "./", "strict": False} for plugin in MCP_PLUGINS]
     return {
@@ -316,16 +341,28 @@ def marketplace_document(skills: list[Skill], version: str) -> dict[str, object]
     }
 
 
+def shown(path: Path) -> str:
+    """A path for messages, relative to the repository where it lies inside."""
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def marketplace(check: bool) -> None:
     number, _ = current_version(CHANGELOG_FILE.read_text(encoding="utf-8"))
     expected = to_json(marketplace_document(load_skills(), number))
-    relative = MARKETPLACE_FILE.relative_to(ROOT).as_posix()
+    relative = shown(MARKETPLACE_FILE)
     if check:
-        current = MARKETPLACE_FILE.read_text(encoding="utf-8") if MARKETPLACE_FILE.exists() else ""
+        current = (
+            MARKETPLACE_FILE.read_text(encoding="utf-8")
+            if MARKETPLACE_FILE.exists()
+            else ""
+        )
         if current != expected:
             sys.exit(
-                f"{relative} does not match the skills and the version in CHANGELOG.md. "
-                "Run: python3 .github/scripts/skills.py marketplace"
+                f"{relative} does not match the skills and the version in "
+                "CHANGELOG.md. Run: uv run .github/scripts/skills.py marketplace"
             )
         print(f"{relative} matches the skills and version {number}.")
         return
@@ -348,7 +385,9 @@ def current_version(changelog: str) -> tuple[str, str]:
 def version(tag: str | None, notes: bool) -> None:
     number, section = current_version(CHANGELOG_FILE.read_text(encoding="utf-8"))
     if tag is not None and tag != f"v{number}":
-        sys.exit(f"Tag '{tag}' is not the newest version in CHANGELOG.md, which is {number}.")
+        sys.exit(
+            f"Tag '{tag}' is not the newest version in CHANGELOG.md, which is {number}."
+        )
     print(section if notes else number, end="" if notes else "\n")
 
 
@@ -366,11 +405,21 @@ def main() -> None:
     pack_parser = commands.add_parser("pack", help="write the ZIPs and skills.json")
     pack_parser.add_argument("out_dir", type=Path)
     pack_parser.add_argument("--version", help="the release X.Y.Z the index links to")
-    market_parser = commands.add_parser("marketplace", help="write .claude-plugin/marketplace.json")
-    market_parser.add_argument("--check", action="store_true", help="only compare, write nothing")
-    version_parser = commands.add_parser("version", help="print the version in CHANGELOG.md")
-    version_parser.add_argument("--tag", help="fail unless this tag is v plus that version")
-    version_parser.add_argument("--notes", action="store_true", help="print the version's section")
+    market_parser = commands.add_parser(
+        "marketplace", help="write .claude-plugin/marketplace.json"
+    )
+    market_parser.add_argument(
+        "--check", action="store_true", help="only compare, write nothing"
+    )
+    version_parser = commands.add_parser(
+        "version", help="print the version in CHANGELOG.md"
+    )
+    version_parser.add_argument(
+        "--tag", help="fail unless this tag is v plus that version"
+    )
+    version_parser.add_argument(
+        "--notes", action="store_true", help="print the version's section"
+    )
     args = parser.parse_args()
     if args.command == "pack":
         pack(args.out_dir, args.version)

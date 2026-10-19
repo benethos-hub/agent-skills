@@ -34,9 +34,16 @@ class LinkTest(unittest.TestCase):
                 file = (path.parent / target).resolve() if target else path
                 with self.subTest(link=f"{where} {link.target}"):
                     self.assertTrue(file.exists(), f"{where}: {target} does not exist")
-                    self.assertTrue(file.is_relative_to(ROOT), f"{where}: {target} points outside the repository")
+                    self.assertTrue(
+                        file.is_relative_to(ROOT),
+                        f"{where}: {target} points outside the repository",
+                    )
                     if fragment and file.suffix == ".md":
-                        self.assertIn(fragment, anchors(file), f"{where}: no heading for #{fragment}")
+                        self.assertIn(
+                            fragment,
+                            anchors(file),
+                            f"{where}: no heading for #{fragment}",
+                        )
 
     def test_links_to_this_repository_are_relative(self):
         # A link to a file of this repository on github.com shows main, not the
@@ -50,22 +57,32 @@ class LinkTest(unittest.TestCase):
     def test_raw_links_to_this_repository_name_existing_files(self):
         # The README shows the icon by its raw URL on main, as PyPI-style
         # renderers need. The file behind it has to exist here too.
-        raw = re.compile(r"^https://raw\.githubusercontent\.com/benethos-hub/agent-skills/main/(.+)$")
+        raw = re.compile(
+            r"^https://raw\.githubusercontent\.com/benethos-hub/agent-skills/main/(.+)$"
+        )
         for path in markdown_files():
             for link in links(path.read_text(encoding="utf-8")):
                 match = raw.match(link.target)
                 if not match:
                     continue
                 with self.subTest(link=f"{rel(path)}:{link.number}"):
-                    self.assertTrue((ROOT / match.group(1)).is_file(), f"{match.group(1)} does not exist")
+                    self.assertTrue(
+                        (ROOT / match.group(1)).is_file(),
+                        f"{match.group(1)} does not exist",
+                    )
 
-    @unittest.skipUnless(os.environ.get("LINKS_ONLINE") == "1", "set LINKS_ONLINE=1 to fetch external links")
+    @unittest.skipUnless(
+        os.environ.get("LINKS_ONLINE") == "1",
+        "set LINKS_ONLINE=1 to fetch external links",
+    )
     def test_external_links_answer(self):
         seen: dict[str, str] = {}
         for path in markdown_files():
             for link in links(path.read_text(encoding="utf-8")):
                 if link.target.startswith(("http://", "https://")):
-                    seen.setdefault(link.target.split("#")[0], f"{rel(path)}:{link.number}")
+                    seen.setdefault(
+                        link.target.split("#")[0], f"{rel(path)}:{link.number}"
+                    )
         for url, where in sorted(seen.items()):
             with self.subTest(url=url):
                 self.assertIsNone(fetch_error(url), f"{where}: {url}")
@@ -98,7 +115,9 @@ class ContentsTest(unittest.TestCase):
             listed = contents(text)
             if listed is None:
                 continue
-            expected = [(h.level - 2, h.anchor) for h in headings(text) if h.level in (2, 3)]
+            expected = [
+                (h.level - 2, h.anchor) for h in headings(text) if h.level in (2, 3)
+            ]
             with self.subTest(file=rel(path)):
                 self.assertEqual(listed, expected)
 
@@ -127,7 +146,9 @@ class TextRulesTest(unittest.TestCase):
         for path in markdown_files():
             for line in prose_lines(path.read_text(encoding="utf-8")):
                 with self.subTest(line=f"{rel(path)}:{line.number}"):
-                    self.assertIsNone(pattern.search(line.text), f"{what}: {line.text.strip()}")
+                    self.assertIsNone(
+                        pattern.search(line.text), f"{what}: {line.text.strip()}"
+                    )
 
     def test_no_semicolons(self):
         self.check(re.compile(";"), "semicolon")

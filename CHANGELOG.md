@@ -9,6 +9,23 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+### Added
+
+- The README opens with the badge rows of the organisation: CI, coverage and
+  licence, the latest release, and the sponsor links. CI writes the coverage
+  badge on every push to `main`, to the branch `badges`.
+
+### Changed
+
+- CI runs the shared checks of the organisation: lint with Ruff and Mypy, the
+  tests on Python 3.11 to 3.15 with a coverage floor of 80 percent, and an
+  audit of the locked tools. The release uploads nothing unless CI passed on
+  its commit on `main`, checked by the organisation's gate.
+- Python runs through uv everywhere. `pyproject.toml` and `uv.lock` hold the
+  test tools, Dependabot keeps them current, and `skills.py` declares in its
+  header that it needs the standard library only. The tests run with
+  `uv run pytest` and cover the command line of `skills.py` as well.
+
 ## [0.2.0] - 2026-10-13
 
 A bundle per category for Claude Code, the skills under `skills/`, the

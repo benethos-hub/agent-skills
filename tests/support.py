@@ -36,7 +36,9 @@ def skill_folders(category: Path) -> list[Path]:
 
 def markdown_files() -> list[Path]:
     return sorted(
-        p for p in ROOT.rglob("*.md") if not any(part.startswith(".") for part in p.relative_to(ROOT).parts[:-1])
+        p
+        for p in ROOT.rglob("*.md")
+        if not any(part.startswith(".") for part in p.relative_to(ROOT).parts[:-1])
     )
 
 
@@ -124,5 +126,7 @@ def links(text: str) -> list[Link]:
     found: list[Link] = []
     for line in prose_lines(text):
         found += [Link(line.number, m.group(2)) for m in LINK.finditer(line.text)]
-        found += [Link(line.number, m.group(1)) for m in HTML_SOURCE.finditer(line.text)]
+        found += [
+            Link(line.number, m.group(1)) for m in HTML_SOURCE.finditer(line.text)
+        ]
     return found

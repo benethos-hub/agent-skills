@@ -13,10 +13,10 @@ name: Release
 #
 # A release starts from a tag vX.Y.Z on main. The version comes from the
 # newest heading in CHANGELOG.md, and its section becomes the release notes:
-#   gh release create v0.1.0 --target main \
-#     --notes "$(python3 .github/scripts/skills.py version --notes)"
-# The job stops before uploading anything if the tag is not that version or
-# a test fails, a stale version number in a Markdown file among them.
+#   gh release create vX.Y.Z --target main \
+#     --notes "$(uv run .github/scripts/skills.py version --notes)"
+# Nothing is uploaded unless CI passed on the release commit on main and the
+# tag is the version in the changelog.
 
 on:
   release:
@@ -26,8 +26,17 @@ permissions:
   contents: read
 
 jobs:
+  # The organisation's gate: the push of the release commit to main ran
+  # ci.yml, and that run succeeded. It waits while the run is still going.
+  ci-passed:
+    uses: benethos-hub/.github/.github/workflows/python-release-ci-passed.yml@main
+    permissions:
+      actions: read
+      contents: read
+
   attach:
     name: Attach the skill archives
+    needs: ci-passed
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -38,14 +47,18 @@ jobs:
           # The write token is for the upload, nothing here pushes.
           persist-credentials: false
 
-      - name: The tag is the version in CHANGELOG.md
-        run: python3 .github/scripts/skills.py version --tag "$GITHUB_REF_NAME"
+      # skills.py needs the standard library only, so there is nothing to
+      # cache. uv provides the Python its header asks for.
+      - name: Install uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: false
 
-      - name: Tests
-        run: python3 -m unittest discover -s tests -v
+      - name: The tag is the version in CHANGELOG.md
+        run: uv run .github/scripts/skills.py version --tag "$GITHUB_REF_NAME"
 
       - name: Check and pack
-        run: python3 .github/scripts/skills.py pack "$RUNNER_TEMP/skills" --version "${GITHUB_REF_NAME#v}"
+        run: uv run .github/scripts/skills.py pack "$RUNNER_TEMP/skills" --version "${GITHUB_REF_NAME#v}"
 
       - name: Attach them to the release
         env:
