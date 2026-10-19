@@ -152,13 +152,15 @@ release takes five steps:
 
 The release workflow then checks, through the organisation's gate, that CI
 passed on the release commit on `main`, and that the tag is the version in
-the changelog. Only then does it attach one file per skill,
-`<skill-name>.zip`, and next to them `skills.json`, an index with each skill's
-name, category, description, links, size and SHA-256. GitHub keeps the files
-of every release under its tag, so a fixed version stays reachable:
+the changelog. Only then does it attach two files per skill with the same
+bytes. `<skill-name>.zip` carries no version and gives the stable link to the
+newest release. `<skill-name>-X.Y.Z.zip` shows on disk which version it is.
+Next to them goes `skills.json`, an index with each skill's name, category,
+description, links, size and SHA-256. GitHub keeps the files of every release
+under its tag, so a fixed version stays reachable:
 
 ```
-https://github.com/benethos-hub/agent-skills/releases/download/v0.2.0/<skill-name>.zip
+https://github.com/benethos-hub/agent-skills/releases/download/v0.2.0/<skill-name>-0.2.0.zip
 ```
 
 The archives are build results and are never checked in.

@@ -4,11 +4,11 @@ name: Release
 # when it is published. The repository stays the source, the archives are
 # build results and are never checked in.
 #
-# Each skill goes up once, as <skill-name>.zip. The name carries no version,
-# so the READMEs have a link that always reaches the newest full release,
-# and every release keeps its own copy under its tag:
+# Each skill goes up twice, with the same bytes. <skill-name>.zip carries no
+# version, so the READMEs have a link that always reaches the newest full
+# release. <skill-name>-X.Y.Z.zip shows on disk which version it is:
 #   releases/latest/download/<skill-name>.zip
-#   releases/download/vX.Y.Z/<skill-name>.zip
+#   releases/download/vX.Y.Z/<skill-name>-X.Y.Z.zip
 # skills.json lists every skill with its header, both links, size and SHA-256.
 #
 # A release starts from a tag vX.Y.Z on main. The version comes from the
