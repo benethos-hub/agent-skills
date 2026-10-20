@@ -16,6 +16,12 @@ The newest version below is the one the next release must carry. Every
   numbers over unchanged, instead of calculating by hand or writing code of
   its own each time. Without code execution the agent still calculates by the
   rules in the skill. The script needs Python 3.11 or newer and nothing else.
+- The subcategory `development/review` with two skills and the bundle
+  `development-review`. `review` checks a project for bugs, security and
+  refactoring on code and structure level and writes one file of work
+  packages, one branch each, for another model to build.
+  `work-through-review` builds such a file, one commit per finding, each
+  finding checked against the code first.
 
 ### Changed
 

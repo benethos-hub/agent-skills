@@ -25,6 +25,40 @@
       ]
     },
     {
+      "name": "review",
+      "description": "Reviews a codebase or a range of changes for bugs, security, refactoring on code level and refactoring on folder, architecture and design level, in any language. Checks every finding in the code before listing it and writes one file of work packages, one package per branch in a sensible order, each finding with its place, evidence, change and test. The file is written for a less capable model or a fresh session to work through without asking back, so the user's decisions are settled first and written in. Changes nothing in the project. Use this skill whenever the user asks for a review, an audit, a security check, a bug hunt or a refactoring check, or for a list of changes or a to-do list that another model or session should work through. Answers in the user's language.",
+      "version": "0.3.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.3.0"
+      },
+      "strict": false,
+      "category": "development",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/development/review/review"
+      ]
+    },
+    {
+      "name": "work-through-review",
+      "description": "Works through a review file of work packages, as the skill review writes it, one branch per package and one commit per finding, in any language. Checks every finding against the current code first, asks all open questions at the start and then works without stopping, skips a finding that turns out wrong and says why, runs the project's checks before each commit and marks each finding done in the file. Builds nothing beyond the list. Pushing, pull requests and merging wait for the user's word unless the user granted them for this list, and a release is never part of it. Use this skill whenever the user hands over a review list, a to-do list of findings or work packages from another session or model, or asks to work through, apply or implement review findings. Answers in the user's language.",
+      "version": "0.3.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.3.0"
+      },
+      "strict": false,
+      "category": "development",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/development/review/work-through-review"
+      ]
+    },
+    {
       "name": "asset-analysis",
       "description": "Writes a structured analysis of a single security from current price, fundamental and news data, with an assessment for the short, medium and long term. Use this skill whenever an ISIN, a ticker or a security's name comes up, or when someone asks about a stock, an ETF, a cryptocurrency, a price target, quarterly figures, analyst opinions, a valuation or a comparison of several securities, also when they only ask in passing what is going on with a security, even when the word analysis is never used. Not for a dividend calendar or a portfolio's distributions per month. Answers in the user's language.",
       "version": "0.3.0",
@@ -89,7 +123,9 @@
       "license": "MIT",
       "repository": "https://github.com/benethos-hub/agent-skills",
       "skills": [
-        "./skills/development/git/commit"
+        "./skills/development/git/commit",
+        "./skills/development/review/review",
+        "./skills/development/review/work-through-review"
       ]
     },
     {
@@ -107,6 +143,24 @@
       "repository": "https://github.com/benethos-hub/agent-skills",
       "skills": [
         "./skills/development/git/commit"
+      ]
+    },
+    {
+      "name": "development-review",
+      "description": "Every review skill of development in one plugin. Skills for reviewing a project in any language and working the review through: the strongest model checks for bugs, security and refactoring and writes the work packages, another model builds them branch by branch.",
+      "version": "0.3.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.3.0"
+      },
+      "strict": false,
+      "category": "development",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/development/review/review",
+        "./skills/development/review/work-through-review"
       ]
     },
     {

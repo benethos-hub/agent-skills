@@ -22,12 +22,13 @@ and releasing to you.
 
 ## Subcategories
 
-The skills are ordered by the tool they work with. Each subcategory has its
+The skills are ordered by what they work on. Each subcategory has its
 own README with its skills and how to use them.
 
 | Subcategory | What for | Skills |
 |---|---|---|
 | [git](git/README.md) | Commits in small, checked steps on the right branch | [commit](git/commit/SKILL.md) |
+| [review](review/README.md) | A checked review written as work packages, and building it branch by branch | [review](review/review/SKILL.md), [work-through-review](review/work-through-review/SKILL.md) |
 
 ## Installing
 
