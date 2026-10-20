@@ -63,6 +63,11 @@ reachable under the same link:
 ```
 https://github.com/benethos-hub/agent-skills/releases/latest/download/<skill-name>.zip
 ```
+
+For a fixed version, every release on the
+[releases page](https://github.com/benethos-hub/agent-skills/releases) also
+carries each ZIP under a name with its version, `<skill-name>-X.Y.Z.zip`.
+
 ### Claude Code
 
 1. Add this repository as a plugin marketplace. This is needed once:

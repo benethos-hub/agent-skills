@@ -68,33 +68,24 @@ explain each part and the other ways.
 
 ### 1. Install the skills
 
-**Claude Code.** The bundle installs both skills and the market-data server
-from step 2 at once. The marketplace has to be added once before:
+In Claude Code the bundle `finance` brings both skills and the market-data
+server from step 2:
 
 ```bash
 claude plugin marketplace add benethos-hub/agent-skills
 claude plugin install finance@benethos-agent-skills
 ```
 
-Install either the bundle or single skills, not both. A skill that comes
-from both is loaded twice.
-
-**Single skills.** Each skill also comes on its own, as a ZIP from the newest
-release and as a plugin of its own:
+Each skill also comes on its own:
 
 | Skill | Download | Claude Code |
 |---|---|---|
 | asset-analysis | [asset-analysis.zip](https://github.com/benethos-hub/agent-skills/releases/latest/download/asset-analysis.zip) | `claude plugin install asset-analysis@benethos-agent-skills` |
 | dividend-calendar | [dividend-calendar.zip](https://github.com/benethos-hub/agent-skills/releases/latest/download/dividend-calendar.zip) | `claude plugin install dividend-calendar@benethos-agent-skills` |
 
-The links always reach the newest release. Every release on the
-[releases page](https://github.com/benethos-hub/agent-skills/releases) also
-carries each ZIP under a name with its version, `<skill-name>-X.Y.Z.zip`, for
-a fixed version.
-
-In claude.ai and Claude Desktop, upload the ZIP in the settings under Skills.
-Other agents and updates are covered under
-[Installing](../../README.md#installing) in the main README.
+The steps for each client, the ZIP of a fixed version and updates work the
+same for every skill of this repository. The
+[main README](../../README.md#installing) covers them.
 
 ### 2. Connect a market-data server
 
