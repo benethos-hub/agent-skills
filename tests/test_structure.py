@@ -6,7 +6,16 @@ import re
 import struct
 import unittest
 
-from support import ROOT, SKILLS, categories, rel, skill_folders, skills
+from support import (
+    ROOT,
+    SKILLS,
+    categories,
+    readme_folders,
+    rel,
+    skill_folders,
+    skills,
+    subcategories,
+)
 
 # Fields the Agent Skills specification defines for the header.
 HEADER_FIELDS = {
@@ -57,7 +66,10 @@ class RootTest(unittest.TestCase):
             rel(f / "SKILL.md") for c in categories() for f in skill_folders(c)
         )
         self.assertEqual(
-            found, expected, "a SKILL.md belongs in skills/<category>/<skill-name>/"
+            found,
+            expected,
+            "a SKILL.md belongs in skills/<category>/<skill-name>/ or "
+            "skills/<category>/<subcategory>/<skill-name>/",
         )
 
 
@@ -87,41 +99,55 @@ class BrandTest(unittest.TestCase):
 
 
 class CategoryTest(unittest.TestCase):
-    def test_category_names(self):
-        for category in categories():
-            with self.subTest(category=category.name):
+    def test_category_and_subcategory_names(self):
+        for folder in readme_folders():
+            with self.subTest(folder=rel(folder)):
                 self.assertRegex(
-                    category.name, skills.NAME_PATTERN, "category names are lower case"
+                    folder.name,
+                    skills.NAME_PATTERN,
+                    "category and subcategory names are lower case",
                 )
 
-    def test_category_has_readme(self):
-        for category in categories():
-            with self.subTest(category=category.name):
+    def test_category_and_subcategory_have_a_readme(self):
+        for folder in readme_folders():
+            with self.subTest(folder=rel(folder)):
                 self.assertTrue(
-                    (category / "README.md").is_file(),
-                    f"{category.name}/README.md is missing",
+                    (folder / "README.md").is_file(), f"{rel(folder)}/README.md"
                 )
 
-    def test_category_holds_only_skills(self):
+    def test_category_holds_skills_or_subcategories(self):
         for category in categories():
-            folders = skill_folders(category)
+            direct = [p for p in skill_folders(category) if p.parent == category]
             with self.subTest(category=category.name):
-                self.assertTrue(folders, f"{category.name} holds no skill")
-            for folder in folders:
-                with self.subTest(folder=rel(folder)):
+                self.assertTrue(skill_folders(category), "holds no skill")
+                self.assertFalse(
+                    direct and subcategories(category),
+                    "holds skills and subcategories, use one of the two",
+                )
+
+    def test_subcategory_holds_only_skills(self):
+        for category in categories():
+            for subcategory in subcategories(category):
+                for folder in sorted(p for p in subcategory.iterdir() if p.is_dir()):
+                    with self.subTest(folder=rel(folder)):
+                        self.assertTrue(
+                            (folder / "SKILL.md").is_file(), "has no SKILL.md"
+                        )
+                with self.subTest(subcategory=rel(subcategory)):
                     self.assertTrue(
-                        (folder / "SKILL.md").is_file(),
-                        f"{rel(folder)} has no SKILL.md",
+                        any(p.is_dir() for p in subcategory.iterdir()),
+                        "holds no skill",
                     )
+
+    def test_no_loose_files(self):
+        for folder in readme_folders():
             loose = sorted(
                 p.name
-                for p in category.iterdir()
+                for p in folder.iterdir()
                 if p.is_file() and p.name != "README.md"
             )
-            with self.subTest(category=category.name):
-                self.assertEqual(
-                    loose, [], f"files in {category.name} besides README.md"
-                )
+            with self.subTest(folder=rel(folder)):
+                self.assertEqual(loose, [], "files besides README.md")
 
 
 class SkillTest(unittest.TestCase):

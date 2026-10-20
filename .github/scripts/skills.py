@@ -4,7 +4,9 @@
 # ///
 """Check the skills in this repository and build what is delivered from them.
 
-A skill is a folder skills/<category>/<skill-name>/ with a SKILL.md. Three
+A skill is a folder skills/<category>/<skill-name>/ with a SKILL.md. A
+category may order its skills into subcategories instead, as
+skills/<category>/<subcategory>/<skill-name>/, but never both at once. Three
 commands:
 
     uv run .github/scripts/skills.py pack OUT_DIR [--version X.Y.Z]
@@ -23,9 +25,10 @@ SHA-256. --version names the release the links point to.
 `marketplace` writes .claude-plugin/marketplace.json, through which Claude
 Code installs every skill as a plugin of its own, from the release tag of the
 newest version in CHANGELOG.md, every category as a bundle of its skills and
-MCP servers, and the MCP servers listed in MCP_PLUGINS on their own as well.
-With --check it writes
-nothing and fails if the file in the repository is not what it would write.
+MCP servers, every subcategory as a bundle <category>-<subcategory>, and the
+MCP servers listed in MCP_PLUGINS on their own as well. With --check it
+writes nothing and fails if the file in the repository is not what it would
+write.
 
 `version` prints the newest version in CHANGELOG.md. With --tag it fails
 unless the tag is that version with a leading v. With --notes it prints that
@@ -112,7 +115,12 @@ class Skill:
 
     @property
     def category(self) -> str:
-        return self.folder.parent.name
+        return self.folder.relative_to(ROOT / "skills").parts[0]
+
+    @property
+    def subcategory(self) -> str | None:
+        parts = self.folder.relative_to(ROOT / "skills").parts
+        return parts[1] if len(parts) == 3 else None
 
     @property
     def path(self) -> str:
@@ -145,7 +153,11 @@ def read_header(skill_md: Path) -> dict[str, str]:
 
 def load_skills() -> list[Skill]:
     """Read and check every skill. Exit with a list of problems if one fails."""
-    folders = sorted(p.parent for p in ROOT.glob("skills/*/*/SKILL.md"))
+    found = [*ROOT.glob("skills/*/*/SKILL.md"), *ROOT.glob("skills/*/*/*/SKILL.md")]
+    # A SKILL.md inside a skill's own folders belongs to that skill.
+    folders = sorted(
+        p.parent for p in found if not (p.parent.parent / "SKILL.md").is_file()
+    )
     if not folders:
         sys.exit("No skills found.")
     skills: list[Skill] = []
@@ -184,6 +196,12 @@ def load_skills() -> list[Skill]:
             )
         seen[folder.name] = where
         skills.append(Skill(folder, header))
+    direct = {skill.category for skill in skills if skill.subcategory is None}
+    nested = {skill.category for skill in skills if skill.subcategory}
+    for category in sorted(direct & nested):
+        problems.append(
+            f"skills/{category}: holds skills and subcategories, use one of the two"
+        )
     if problems:
         print("The skills do not pass the check:", file=sys.stderr)
         for problem in problems:
@@ -241,6 +259,7 @@ def pack(out_dir: Path, version: str | None) -> None:
             {
                 "name": skill.name,
                 "category": skill.category,
+                "subcategory": skill.subcategory,
                 "description": skill.header["description"],
                 "license": skill.header.get("license"),
                 "path": skill.path,
@@ -256,12 +275,15 @@ def pack(out_dir: Path, version: str | None) -> None:
     print(f"index: {len(index)} skills -> skills.json")
 
 
-def category_summary(category: str) -> str:
-    """The first paragraph of the category's README, below its title and its
-    badge rows."""
-    readme = ROOT / "skills" / category / "README.md"
+def category_summary(category: str, subcategory: str | None = None) -> str:
+    """The first paragraph of the README of a category or subcategory, below
+    its title and its badge rows."""
+    folder = ROOT / "skills" / category
+    if subcategory:
+        folder = folder / subcategory
+    readme = folder / "README.md"
     if not readme.is_file():
-        sys.exit(f"skills/{category}/README.md is missing.")
+        sys.exit(f"{shown(readme)} is missing.")
     paragraph: list[str] = []
     for line in readme.read_text(encoding="utf-8").splitlines()[1:]:
         if line.strip():
@@ -283,19 +305,30 @@ def marketplace_document(skills: list[Skill], version: str) -> dict[str, object]
     #
     # Then one bundle per category: every skill of it and the MCP servers of
     # the same category, installed with a single command. No skill depends
-    # on a server, the bundle only offers both together.
+    # on a server, the bundle only offers both together. A category with
+    # subcategories also gets one bundle per subcategory, named
+    # <category>-<subcategory>, with the same servers.
     #
     # The MCP servers follow on their own. They carry no files, only the
     # command.
     release = {"source": "url", "url": f"{REPOSITORY_URL}.git", "ref": f"v{version}"}
-    categories = sorted({skill.category for skill in skills})
+    groups: list[tuple[str, str, str | None]] = []
+    for category in sorted({skill.category for skill in skills}):
+        groups.append((category, category, None))
+        subcategories = {s.subcategory for s in skills if s.category == category}
+        groups += [
+            (f"{category}-{sub}", category, sub)
+            for sub in sorted(sub for sub in subcategories if sub)
+        ]
     names = (
-        [skill.name for skill in skills] + categories + [p["name"] for p in MCP_PLUGINS]
+        [skill.name for skill in skills]
+        + [name for name, _, _ in groups]
+        + [p["name"] for p in MCP_PLUGINS]
     )
     taken = sorted({name for name in names if names.count(name) > 1})
     if taken:
         sys.exit(
-            "Plugin names used twice by skills, categories or MCP servers: "
+            "Plugin names used twice by skills, bundles or MCP servers: "
             + ", ".join(taken)
         )
 
@@ -313,17 +346,25 @@ def marketplace_document(skills: list[Skill], version: str) -> dict[str, object]
         }
         for skill in skills
     ]
-    for category in categories:
-        members = [skill for skill in skills if skill.category == category]
+    for name, category, subcategory in groups:
+        members = [
+            skill
+            for skill in skills
+            if skill.category == category
+            and (subcategory is None or skill.subcategory == subcategory)
+        ]
         servers = [p for p in MCP_PLUGINS if p["category"] == category]
-        description = f"Every {category} skill in one plugin"
+        if subcategory:
+            description = f"Every {subcategory} skill of {category} in one plugin"
+        else:
+            description = f"Every {category} skill in one plugin"
         if servers:
             noun = "servers" if len(servers) > 1 else "server"
             listed = ", ".join(p["name"] for p in servers)
             description += f", with the MCP {noun} {listed} for the data"
-        description += f". {category_summary(category)}"
+        description += f". {category_summary(category, subcategory)}"
         bundle: dict[str, object] = {
-            "name": category,
+            "name": name,
             "description": description,
             "version": version,
             "source": release,

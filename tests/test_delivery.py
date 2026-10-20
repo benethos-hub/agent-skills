@@ -15,7 +15,15 @@ import zipfile
 from pathlib import Path
 from unittest import mock
 
-from support import ROOT, categories, rel, skill_folders, skills
+from support import (
+    ROOT,
+    categories,
+    readme_folders,
+    rel,
+    skill_folders,
+    skills,
+    subcategories,
+)
 
 MARKETPLACE = skills.MARKETPLACE_NAME
 
@@ -73,7 +81,11 @@ class PackTest(unittest.TestCase):
 
     def test_index_matches_the_archives(self):
         self.assertEqual(self.index["version"], "9.9.9")
-        self.assertEqual([s["name"] for s in self.index["skills"]], self.names)
+        # The index lists the skills by category, then by name.
+        self.assertEqual(
+            [s["name"] for s in self.index["skills"]],
+            [f.name for c in categories() for f in skill_folders(c)],
+        )
         for entry in self.index["skills"]:
             data = (self.tmp / f"{entry['name']}.zip").read_bytes()
             with self.subTest(skill=entry["name"]):
@@ -159,6 +171,27 @@ class PackRulesTest(unittest.TestCase):
                 self.assertIn(expected, report)
         self.assertNotIn("skills/a/good-one:", report)
 
+    def test_a_category_holds_skills_or_subcategories(self):
+        root = self.make_repo(
+            {
+                "skills/a/direct/SKILL.md": header("direct", "x"),
+                "skills/a/sub/nested/SKILL.md": header("nested", "x"),
+            }
+        )
+        self.assertIn("skills/a: holds skills and subcategories", self.problems(root))
+
+    def test_subcategories_are_read(self):
+        root = self.make_repo(
+            {
+                "skills/dev/git/commit/SKILL.md": header("commit", "x"),
+                "skills/dev/git/commit/references/SKILL.md": "not a skill",
+                "skills/flat/plain/SKILL.md": header("plain", "x"),
+            }
+        )
+        with mock.patch.object(skills, "ROOT", root):
+            found = {s.name: (s.category, s.subcategory) for s in skills.load_skills()}
+        self.assertEqual(found, {"commit": ("dev", "git"), "plain": ("flat", None)})
+
     def test_leftovers_stay_out_of_the_zip(self):
         root = self.make_repo(
             {
@@ -214,9 +247,11 @@ class MarketplaceTest(unittest.TestCase):
         number, _ = skills.current_version(
             (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
         )
-        names = {f.name for c in categories() for f in skill_folders(c)} | {
-            c.name for c in categories()
-        }
+        names = (
+            {f.name for c in categories() for f in skill_folders(c)}
+            | {c.name for c in categories()}
+            | {f"{c.name}-{s.name}" for c in categories() for s in subcategories(c)}
+        )
         for plugin in self.document["plugins"]:
             if plugin["name"] not in names:
                 continue
@@ -240,6 +275,23 @@ class MarketplaceTest(unittest.TestCase):
                 expected = {k: v for p in servers for k, v in p["mcpServers"].items()}
                 self.assertEqual(bundle.get("mcpServers", {}), expected)
 
+    def test_every_subcategory_is_a_bundle(self):
+        plugins = {p["name"]: p for p in self.document["plugins"]}
+        for category in categories():
+            for subcategory in subcategories(category):
+                name = f"{category.name}-{subcategory.name}"
+                with self.subTest(bundle=name):
+                    self.assertIn(name, plugins)
+                    self.assertEqual(
+                        plugins[name]["skills"],
+                        [
+                            f"./{rel(f)}"
+                            for f in skill_folders(category)
+                            if f.parent == subcategory
+                        ],
+                    )
+                    self.assertEqual(plugins[name]["category"], category.name)
+
     def test_plugin_names_are_unique(self):
         names = [p["name"] for p in self.document["plugins"]]
         self.assertEqual(len(names), len(set(names)))
@@ -259,7 +311,7 @@ class ReadmeTest(unittest.TestCase):
             'agent-skills/main/assets/brand/icon.svg" alt="" width="40" '
             'height="40"> '
         )
-        for path in [ROOT / "README.md"] + [c / "README.md" for c in categories()]:
+        for path in [ROOT / "README.md"] + [f / "README.md" for f in readme_folders()]:
             lines = path.read_text(encoding="utf-8").splitlines()
             with self.subTest(readme=str(path.relative_to(ROOT))):
                 self.assertTrue(lines[0].startswith(icon), "no icon beside the title")
@@ -280,10 +332,11 @@ class ReadmeTest(unittest.TestCase):
 
     def test_bundle_description_skips_the_badge_rows(self):
         for category in categories():
-            with self.subTest(category=category.name):
-                summary = skills.category_summary(category.name)
-                self.assertTrue(summary)
-                self.assertNotIn("[![", summary)
+            for sub in (None, *(s.name for s in subcategories(category))):
+                with self.subTest(category=category.name, subcategory=sub):
+                    summary = skills.category_summary(category.name, sub)
+                    self.assertTrue(summary)
+                    self.assertNotIn("[![", summary)
 
     def test_root_readme_lists_every_category_and_skill(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -298,19 +351,33 @@ class ReadmeTest(unittest.TestCase):
             )
             category = match.group(1)
             listed[category] = sorted(
-                re.findall(rf"\]\(skills/{category}/([^/]+)/SKILL\.md\)", row)
+                re.findall(
+                    rf"\]\(skills/{category}/(?:[^/)]+/)?([^/)]+)/SKILL\.md\)", row
+                )
             )
         expected = {
             c.name: sorted(f.name for f in skill_folders(c)) for c in categories()
         }
         self.assertEqual(listed, expected)
 
-    def test_category_readme_names_every_skill(self):
+    def test_category_readme_links_every_skill_and_subcategory(self):
         for category in categories():
             text = (category / "README.md").read_text(encoding="utf-8")
             for folder in skill_folders(category):
+                path = folder.relative_to(category).as_posix()
+                with self.subTest(skill=rel(folder)):
+                    self.assertIn(f"]({path}/SKILL.md)", text)
+            for subcategory in subcategories(category):
+                with self.subTest(subcategory=rel(subcategory)):
+                    self.assertIn(f"]({subcategory.name}/README.md)", text)
+
+    def test_readme_beside_a_skill_offers_it(self):
+        # The README of the category or subcategory a skill lies in.
+        for category in categories():
+            for folder in skill_folders(category):
+                text = (folder.parent / "README.md").read_text(encoding="utf-8")
                 name = folder.name
-                with self.subTest(skill=name):
+                with self.subTest(skill=rel(folder)):
                     self.assertIn(
                         f"]({name}/SKILL.md)", text, "no link to the SKILL.md"
                     )
@@ -325,13 +392,15 @@ class ReadmeTest(unittest.TestCase):
                         "no install command",
                     )
 
-    def test_category_readme_names_its_bundle(self):
-        for category in categories():
-            text = (category / "README.md").read_text(encoding="utf-8")
-            with self.subTest(category=category.name):
-                self.assertIn(
-                    f"claude plugin install {category.name}@{MARKETPLACE}", text
-                )
+    def test_readme_names_its_bundle(self):
+        for folder in readme_folders():
+            text = (folder / "README.md").read_text(encoding="utf-8")
+            if folder.parent.name == "skills":
+                bundle = folder.name
+            else:
+                bundle = f"{folder.parent.name}-{folder.name}"
+            with self.subTest(bundle=bundle):
+                self.assertIn(f"claude plugin install {bundle}@{MARKETPLACE}", text)
 
     def test_category_readme_names_its_mcp_plugins(self):
         for plugin in skills.MCP_PLUGINS:
