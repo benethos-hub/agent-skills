@@ -56,12 +56,17 @@ The shortest way depends on the client:
 | claude.ai and Claude Desktop | Download the skill's ZIP and upload it under Settings, Skills. |
 | Other agents | Unpack the skill's ZIP into the agent's skills directory. |
 
-Every release carries each skill as a ZIP of its own. The category's README
-links them directly. The newest one is always reachable under the same link:
+Every release carries each skill as a ZIP of its own. The README of each
+category or subcategory links them directly. The newest one is always
+reachable under the same link:
 
 ```
 https://github.com/benethos-hub/agent-skills/releases/latest/download/<skill-name>.zip
 ```
+
+For a fixed version, every release on the
+[releases page](https://github.com/benethos-hub/agent-skills/releases) also
+carries each ZIP under a name with its version, `<skill-name>-X.Y.Z.zip`.
 
 ### Claude Code
 
@@ -78,14 +83,17 @@ https://github.com/benethos-hub/agent-skills/releases/latest/download/<skill-nam
    claude plugin install finance@benethos-agent-skills
    ```
 
-   To pick single skills instead, install each as a plugin of its own:
+   A category with subcategories also has a bundle per subcategory, named
+   `<category>-<subcategory>`. To pick single skills instead, install each as
+   a plugin of its own:
 
    ```bash
    claude plugin install dividend-calendar@benethos-agent-skills
    ```
 
-Take either the bundle of a category or single skills from it, not both. A
-skill that comes from both is loaded twice.
+Take one of these for a category: its bundle, the bundles of its
+subcategories, or single skills. A skill that comes from two of them is
+loaded twice.
 
 Claude Code installs the state of the newest release, the same the ZIPs carry.
 Changes on `main` that are not released yet do not reach it.
@@ -182,8 +190,9 @@ release tag it names. That is why the file has to name the new tag before a
 release, and why the release follows the merge right away.
 
 The file is generated from the skills and never edited by hand. It holds one
-plugin per skill, one bundle per category and each MCP server on its own. A
-bundle carries every skill of its category and the MCP servers listed for
+plugin per skill, one bundle per category, one bundle per subcategory named
+`<category>-<subcategory>` and each MCP server on its own. A bundle carries
+every skill of its category or subcategory and the MCP servers listed for
 that category in `MCP_PLUGINS` in `.github/scripts/skills.py`. CI fails when
 the file no longer matches the skills.
 
@@ -203,8 +212,9 @@ The newest Python version also measures the coverage of
 `.github/scripts/skills.py`, with a floor of 80 percent. The tests check:
 
 - **Layout.** `skills/` holds only categories, and every `SKILL.md` lies in
-  one of them. Every category has a README and holds only skill folders. Every
-  skill folder holds only what the standard allows.
+  one of them. Every category holds either skill folders or subcategories,
+  never both, and every category and subcategory has a README. Every skill
+  folder holds only what the standard allows.
 - **Headers.** Name, description and the other fields follow the Agent Skills
   specification. Names are unique in the whole repository.
 - **Consistency.** The READMEs list every category and skill with its download
@@ -241,7 +251,7 @@ agent-skills/
     brand/            # icon.svg, icon.png 512x512, social-preview.png 1280x640
     render_brand.py   # draws both PNGs from icon.svg: uv run assets/render_brand.py
   .claude-plugin/
-    marketplace.json  # generated, for Claude Code: one plugin per skill, category and MCP server
+    marketplace.json  # generated, for Claude Code: one plugin per skill, bundle and MCP server
   .github/
     scripts/skills.py # checks the skills, packs the ZIPs, writes both JSON files
     workflows/        # CI on every push, the release assets on every release
@@ -253,6 +263,12 @@ agent-skills/
         SKILL.md      # required: header with name and description, then the instructions
         references/   # optional: longer reference texts the instructions point to
         scripts/      # optional: helper scripts
+    <category>/       # a category with subcategories instead of skills
+      README.md       # its subcategories, what they need, the setup
+      <subcategory>/
+        README.md     # its skills, their downloads and install commands
+        <skill-name>/
+          SKILL.md
 ```
 
 ### Rules for a new skill
@@ -261,12 +277,18 @@ agent-skills/
   a short English name in lower case. A new category gets its own README.md
   and a row in the table above. The first paragraph of that README becomes
   the description of the category's bundle in Claude Code.
+- A category can order its skills into subcategories, such as
+  `development/git/`, when it holds many of them. It then holds only
+  subcategories, no skill folders beside them. Each subcategory gets a
+  README.md whose first paragraph describes its bundle, and the category's
+  README links it.
 - The folder name equals `name` in the header: lower-case letters, digits and
   single hyphens, at most 64 characters. A name is used only once in the whole
   repository, because the ZIPs and plugins carry it without the category.
 - `description` says what the skill does and when an agent should use it, in at
   most 1,024 characters. It is the only part an agent reads up front.
-- The category's README lists the skill and names what it needs to give a
+- The README of the category or subcategory the skill lies in lists it with
+  its download link and install command, and names what it needs to give a
   useful answer.
 - After adding, renaming or changing the header of a skill, regenerate the
   marketplace file with `uv run .github/scripts/skills.py marketplace`.

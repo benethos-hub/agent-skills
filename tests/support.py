@@ -30,8 +30,25 @@ def categories() -> list[Path]:
     return sorted(p for p in SKILLS.iterdir() if p.is_dir())
 
 
+def subcategories(category: Path) -> list[Path]:
+    """The folders of a category that are not skills themselves."""
+    return sorted(
+        p for p in category.iterdir() if p.is_dir() and not (p / "SKILL.md").is_file()
+    )
+
+
 def skill_folders(category: Path) -> list[Path]:
-    return sorted(p for p in category.iterdir() if p.is_dir())
+    """Every skill of a category, directly in it or in one of its subcategories."""
+    direct = [
+        p for p in category.iterdir() if p.is_dir() and (p / "SKILL.md").is_file()
+    ]
+    nested = [p for s in subcategories(category) for p in s.iterdir() if p.is_dir()]
+    return sorted(direct + nested)
+
+
+def readme_folders() -> list[Path]:
+    """Every category and subcategory, each of which carries a README."""
+    return [f for c in categories() for f in (c, *subcategories(c))]
 
 
 def markdown_files() -> list[Path]:
