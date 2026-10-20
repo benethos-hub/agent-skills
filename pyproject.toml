@@ -1,6 +1,6 @@
 # Tools for the tests of this repository, locked in uv.lock so Dependabot keeps
-# them current. Nothing here is a package. The scripts in .github/scripts use
-# the standard library only and run with uv run as well.
+# them current. Nothing here is a package. The scripts in .github/scripts and
+# in the skills use the standard library only and run with uv run as well.
 
 [project]
 name = "agent-skills"
@@ -25,7 +25,7 @@ pythonpath = ["tests"]
 
 [tool.mypy]
 strict = true
-files = [".github/scripts/skills.py"]
+files = [".github/scripts/skills.py", "skills"]
 
 # The rule set of the Python projects of the organisation.
 [tool.ruff]
@@ -42,7 +42,8 @@ select = [
     "W",    # pycodestyle warnings
 ]
 
-# What python-tests.yml measures: the script the workflows run.
+# What python-tests.yml measures: the script the workflows run and the
+# scripts the skills bring.
 [tool.coverage.run]
-source = [".github/scripts"]
+source = [".github/scripts", "skills"]
 branch = true

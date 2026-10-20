@@ -25,8 +25,9 @@ jobs:
     uses: benethos-hub/.github/.github/workflows/python-lint.yml@main
 
   # The tests on every supported Python version, the coverage of
-  # .github/scripts on the newest with a floor of 80 percent. That run also
-  # writes the coverage as a badge for the job coverage-badge.
+  # .github/scripts and the skill scripts on the newest with a floor of 80
+  # percent. That run also writes the coverage as a badge for the job
+  # coverage-badge.
   test:
     uses: benethos-hub/.github/.github/workflows/python-tests.yml@main
     with:
