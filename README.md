@@ -40,6 +40,7 @@ its own README with its skills, what they need and how to set it up.
 
 | Category | What for | Skills |
 |---|---|---|
+| [development](skills/development/README.md) | Work in a repository, in any language: checked commits on the right branch | [commit](skills/development/git/commit/SKILL.md) |
 | [finance](skills/finance/README.md) | Securities and portfolios, calculated from current market data | [asset-analysis](skills/finance/asset-analysis/SKILL.md), [dividend-calendar](skills/finance/dividend-calendar/SKILL.md) |
 | [workflow](skills/workflow/README.md) | Long working sessions with an agent, kept safe across a context compaction | [prepare-for-compaction](skills/workflow/prepare-for-compaction/SKILL.md) |
 
@@ -83,9 +84,9 @@ carries each ZIP under a name with its version, `<skill-name>-X.Y.Z.zip`.
    claude plugin install finance@benethos-agent-skills
    ```
 
-   A category with subcategories also has a bundle per subcategory, named
-   `<category>-<subcategory>`. To pick single skills instead, install each as
-   a plugin of its own:
+   A category with subcategories also has a bundle per subcategory, such as
+   `development-git`. To pick single skills instead, install each as a plugin
+   of its own:
 
    ```bash
    claude plugin install dividend-calendar@benethos-agent-skills
