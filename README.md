@@ -45,7 +45,8 @@ its own README with its skills, what they need and how to set it up.
 | [workflow](skills/workflow/README.md) | Long working sessions with an agent, kept safe across a context compaction | [prepare-for-compaction](skills/workflow/prepare-for-compaction/SKILL.md) |
 
 Some skills only give a useful answer when the agent can reach the right MCP
-server. The category's README says which one and how to connect it.
+server, a tool server the agent talks to over the Model Context Protocol. The
+category's README says which one and how to connect it.
 
 ## Installing
 
@@ -166,8 +167,8 @@ the changelog. Only then does it attach two files per skill with the same
 bytes. `<skill-name>.zip` carries no version and gives the stable link to the
 newest release. `<skill-name>-X.Y.Z.zip` shows on disk which version it is.
 Next to them goes `skills.json`, an index with each skill's name, category,
-description, links, size and SHA-256. GitHub keeps the files of every release
-under its tag, so a fixed version stays reachable:
+subcategory, description, links, size and SHA-256. GitHub keeps the files of
+every release under its tag, so a fixed version stays reachable:
 
 ```
 https://github.com/benethos-hub/agent-skills/releases/download/vX.Y.Z/<skill-name>-X.Y.Z.zip
@@ -293,7 +294,8 @@ agent-skills/
   useful answer.
 - After adding, renaming or changing the header of a skill, regenerate the
   marketplace file with `uv run .github/scripts/skills.py marketplace`.
-- English, no semicolons, no emojis. The answer follows the user's language.
+- English, no semicolons, no em or en dashes, no emojis. The answer follows the
+  user's language.
 - Gaps in the data are named, not covered up. The skill says what it does not
   do, and the category's README carries the disclaimer for its field.
 

@@ -45,7 +45,7 @@ Take one of the three: the bundle of the category, the bundles of
 subcategories, or single skills. A skill that comes from two of them is
 loaded twice.
 
-Every other client, the ZIP downloads and updates work the same for all
+For every other client, the ZIP downloads and updates work the same for all
 skills of this repository. The [main README](../../README.md#installing)
 covers them.
 

@@ -9,6 +9,11 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-20
+
+Two new categories with a skill each, subcategories with their own bundles,
+two ZIP names per skill, and CI on the shared checks of the organisation.
+
 ### Added
 
 - A new category `workflow` with the skill `prepare-for-compaction`. It moves

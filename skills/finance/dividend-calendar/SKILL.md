@@ -16,13 +16,9 @@ Two attitudes carry everything else:
 
 **Second: gaps belong in the answer.** The data has gaps, and every future value is a forecast. An estimated pay date, a missing exchange rate or a position without history is named, not covered up. A calendar is a planning tool, not an account statement.
 
----
-
 ## Language of the answer
 
 Write the answer in the language the user writes in. Headings, column names, status words and the disclaimer follow that language too. Format numbers, dates and currencies by the user's conventions, for German a decimal comma and a thousands point (1.234,56 €) and dates as 13.10.2026.
-
----
 
 ## Input
 
@@ -37,8 +33,6 @@ A position without a share count appears as a watch item, with amounts per share
 German WKNs cannot be resolved by the usual data sources. In that case ask for an ISIN, a ticker or a name.
 
 The share counts stay in the conversation. No data tool needs them, and none receives them. Only symbols and ISINs are queried.
-
----
 
 ## Procedure
 
@@ -91,8 +85,6 @@ Every rule here is fixed. Deviations only on explicit request, and then reported
 
 Structure below.
 
----
-
 ## Output structure
 
 The skeleton in English. Translate every heading, column and phrase into the user's language.
@@ -136,8 +128,6 @@ Leave out the payments in detail when only the overview was asked for.
 
 Only on explicit request. Then a column or table of its own, labelled scenario, never mixed into the forecast. Its basis is the last change of each position's annual dividend, calculated from the history and shown with its derivation. The scenario is a calculation under an assumption, not a forecast.
 
----
-
 ## Language and style
 
 Plain and factual, no sales tone, in the user's language.
@@ -151,11 +141,9 @@ Plain and factual, no sales tone, in the user's language.
 
 Gaps and assumptions stand in their own list, right next to the numbers. Separate from that, the disclaimer comes at the very end, and it is **two sentences**: the data can be incomplete and delayed, and every future value is a forecast without guarantee. No investment and no tax advice.
 
----
-
 ## What this skill does not do
 
-No tax calculation, no investment advice, no recommendation to buy, hold or sell. No access to a depot or a broker, no orders.
+No tax calculation, no investment advice, no recommendation to buy, hold or sell. No access to a securities account or a broker, no orders.
 
 Do not pretend to know what is not known. An estimated pay date is marked as estimated, a missing number as missing. An honest gap is better than a plausible invention.
 
