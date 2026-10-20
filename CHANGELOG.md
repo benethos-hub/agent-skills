@@ -9,6 +9,12 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+### Changed
+
+- The release runs the dependency audit of `uv.lock` once more before it
+  uploads anything, for a vulnerability that became known between the merge
+  and the release.
+
 ## [0.3.0] - 2026-10-20
 
 Two new categories with a skill each, subcategories with their own bundles,
