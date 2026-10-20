@@ -133,7 +133,7 @@ Another session may work in the same repository. Its branch, its pull request or
 
 ## 4. Invented time spans
 
-"Since weeks" or "nobody has missed it" reads like an observation. In a young repository it can be impossible. Look it up in the history or leave it out.
+"For weeks" or "nobody has missed it" reads like an observation. In a young repository it can be impossible. Look it up in the history or leave it out.
 
 ## 5. Side effects dressed up as decisions
 

@@ -1,6 +1,6 @@
 ---
 name: asset-analysis
-description: "Writes a structured analysis of a single security from current price, fundamental and news data, with an assessment for the short, medium and long term. Use this skill whenever an ISIN, a ticker or a security's name comes up, or when someone asks about a stock, an ETF, a cryptocurrency, a price target, quarterly figures, analyst opinions, a valuation or a comparison of several securities, also when they only ask in passing what is going on with a title and the word analysis never falls. Not for a dividend calendar or a portfolio's distributions per month. Answers in the user's language."
+description: "Writes a structured analysis of a single security from current price, fundamental and news data, with an assessment for the short, medium and long term. Use this skill whenever an ISIN, a ticker or a security's name comes up, or when someone asks about a stock, an ETF, a cryptocurrency, a price target, quarterly figures, analyst opinions, a valuation or a comparison of several securities, also when they only ask in passing what is going on with a security, even when the word analysis is never used. Not for a dividend calendar or a portfolio's distributions per month. Answers in the user's language."
 license: MIT
 ---
 
@@ -18,13 +18,9 @@ Two attitudes carry everything else:
 
 **Second: narrative is not evidence.** Companies announce pipelines, letters of intent and partnerships. The accounts show revenue and cash outflow. Where the two drift apart, that gap is the analysis.
 
----
-
 ## Language of the answer
 
 Write the answer in the language the user writes in, headings and disclaimer included. Format numbers, dates and currencies by the user's conventions, for German a decimal comma and a thousands point.
-
----
 
 ## Procedure
 
@@ -94,8 +90,6 @@ One quarter says little. Two short series cost almost nothing and put everything
 - **Revenue and earnings over three to four years.** Only then does a weak quarter show as a slip or as the end of a trend.
 - **Share count over several years.** The pattern of dilution says more than the last capital increase.
 
----
-
 ## Signals to look for
 
 They are in no data set, but often the most telling part of an analysis.
@@ -109,8 +103,6 @@ They are in no data set, but often the most telling part of an analysis.
 - **Accelerating cash outflow.** Often more important than revenue for young companies.
 - **Negative P/E.** It means a loss. Write "loss-making", never quote it as a multiple.
 - **Price against the 50-day and 200-day averages.** One sentence on the position, no chart-reading forecasts.
-
----
 
 ## Output structure
 
@@ -163,8 +155,6 @@ Sources:
 
 **Several securities:** start with an overview table (price, change over one year, analyst target, character in three words), then one block per security. End with one line on what the selection has in common, such as shared drivers or risks. That is a property of the selection, not a statement about the user's portfolio.
 
----
-
 ## Language and style
 
 Professional, no sales tone, in the user's language.
@@ -181,8 +171,6 @@ Professional, no sales tone, in the user's language.
 **Caveats:** uncertainties in the data belong in the analysis, where they occur or in a short paragraph before the end, each with where to check it. Separate from that, the legal disclaimer at the very end is **two sentences**: no investment adviser and no recommendation, prices partly delayed and in local currency.
 
 **Sources:** every analysis ends with `Sources:` and links to the pages actually used. No invented or unopened links.
-
----
 
 ## What this skill does not do
 
@@ -222,7 +210,7 @@ Prices are partly delayed. During trading hours a price is a snapshot, not a clo
 
 ## 6. Currencies
 
-Nothing is converted. Every price, market cap and balance-sheet figure is in the instrument's currency. A comparison of a Swedish, a Hong Kong and a US title mixes three currencies without any hint in the data. Form multiples within one instrument, where the currency cancels out.
+Nothing is converted. Every price, market cap and balance-sheet figure is in the instrument's currency. A comparison of a Swedish, a Hong Kong and a US security mixes three currencies without any hint in the data. Form multiples within one instrument, where the currency cancels out.
 
 ## 7. Beta and other artefacts
 
