@@ -248,23 +248,42 @@ class MarketplaceTest(unittest.TestCase):
 class ReadmeTest(unittest.TestCase):
     """The READMEs name every skill and every way to get it."""
 
-    def test_root_readme_opens_with_the_badge_rows(self):
-        # The rule of the organisation: CI, coverage and licence, then where
-        # to get it, then the sponsor links, each row apart by a blank line.
-        lines = (ROOT / "README.md").read_text(encoding="utf-8").splitlines()
-        badges = [line.split("]")[0] for line in lines[2:11] if line]
-        self.assertEqual(
-            badges,
-            [
-                "[![CI",
-                "[![Coverage",
-                "[![License",
-                "[![Release",
-                "[![Sponsor",
-                "[![PayPal",
-            ],
+    def test_every_readme_opens_with_the_icon_and_the_badge_rows(self):
+        # The rule of the organisation: the icon beside the title, then CI,
+        # coverage and licence, then where to get it, then the sponsor links,
+        # each row apart by a blank line. The category READMEs carry the
+        # same rows as the main README.
+        main = (ROOT / "README.md").read_text(encoding="utf-8").splitlines()
+        icon = (
+            '# <img src="https://raw.githubusercontent.com/benethos-hub/'
+            'agent-skills/main/assets/brand/icon.svg" alt="" width="40" '
+            'height="40"> '
         )
-        self.assertEqual([lines[5], lines[7], lines[10]], ["", "", ""])
+        for path in [ROOT / "README.md"] + [c / "README.md" for c in categories()]:
+            lines = path.read_text(encoding="utf-8").splitlines()
+            with self.subTest(readme=str(path.relative_to(ROOT))):
+                self.assertTrue(lines[0].startswith(icon), "no icon beside the title")
+                badges = [line.split("]")[0] for line in lines[2:11] if line]
+                self.assertEqual(
+                    badges,
+                    [
+                        "[![CI",
+                        "[![Coverage",
+                        "[![License",
+                        "[![Release",
+                        "[![Sponsor",
+                        "[![PayPal",
+                    ],
+                )
+                self.assertEqual([lines[5], lines[7], lines[10]], ["", "", ""])
+                self.assertEqual(lines[2:10], main[2:10])
+
+    def test_bundle_description_skips_the_badge_rows(self):
+        for category in categories():
+            with self.subTest(category=category.name):
+                summary = skills.category_summary(category.name)
+                self.assertTrue(summary)
+                self.assertNotIn("[![", summary)
 
     def test_root_readme_lists_every_category_and_skill(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8")
