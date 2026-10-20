@@ -139,14 +139,14 @@ release takes five steps:
 2. Regenerate the marketplace file, which points Claude Code to the new tag:
    `uv run .github/scripts/skills.py marketplace`.
 3. Run the tests. They name every `vX.Y.Z` in a Markdown file that does not
-   match the new version yet. Update those lines.
+   match the new version. Update those lines.
 4. Merge into `main` through a pull request.
 5. Publish the release right after the merge. Until then the marketplace on
    `main` names a tag that does not exist yet, and installs in Claude Code
-   fail. The release notes are the version's section of the changelog:
+   fail. The tag and the release notes both come from the changelog:
 
    ```bash
-   gh release create v0.2.0 --target main \
+   gh release create "v$(uv run .github/scripts/skills.py version)" --target main \
      --notes "$(uv run .github/scripts/skills.py version --notes)"
    ```
 
@@ -160,8 +160,11 @@ description, links, size and SHA-256. GitHub keeps the files of every release
 under its tag, so a fixed version stays reachable:
 
 ```
-https://github.com/benethos-hub/agent-skills/releases/download/v0.2.0/<skill-name>-0.2.0.zip
+https://github.com/benethos-hub/agent-skills/releases/download/vX.Y.Z/<skill-name>-X.Y.Z.zip
 ```
+
+Releases up to 0.2.0 carry only `<skill-name>.zip`. Their fixed link is
+`releases/download/vX.Y.Z/<skill-name>.zip`.
 
 The archives are build results and are never checked in.
 
