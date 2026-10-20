@@ -42,6 +42,23 @@
       ]
     },
     {
+      "name": "prepare-for-compaction",
+      "description": "Prepares a working session for a context compaction or a new session. Moves what only the conversation holds into the agent's persistent memory: the user's decisions in their own words, corrections, permissions and how far they reach, traps of the environment and the exact state of the work. Measures every fact before writing it down, refreshes the memories the session touched, tidies what the new state replaces and leaves the project's files alone. Use this skill whenever the user asks to prepare for a compact, a compaction, a context reset or a handover to the next session, also in short forms such as 'prepare compact' or 'auf compact vorbereiten'. Answers in the user's language.",
+      "version": "0.2.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.2.0"
+      },
+      "strict": false,
+      "category": "workflow",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/workflow/prepare-for-compaction"
+      ]
+    },
+    {
       "name": "finance",
       "description": "Every finance skill in one plugin, with the MCP server benethos-yahoo-finance-mcp for the data. Skills for securities and portfolios. They calculate from current market data and name every gap in it. They give no recommendation and no investment, tax or legal advice.",
       "version": "0.2.0",
@@ -66,6 +83,23 @@
           ]
         }
       }
+    },
+    {
+      "name": "workflow",
+      "description": "Every workflow skill in one plugin. Skills for long working sessions with an agent. They keep decisions, permissions and the state of the work safe across a context compaction and into the next session. They change no file of the project.",
+      "version": "0.2.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.2.0"
+      },
+      "strict": false,
+      "category": "workflow",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/workflow/prepare-for-compaction"
+      ]
     },
     {
       "name": "benethos-yahoo-finance-mcp",

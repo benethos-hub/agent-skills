@@ -41,6 +41,7 @@ its own README with its skills, what they need and how to set it up.
 | Category | What for | Skills |
 |---|---|---|
 | [finance](skills/finance/README.md) | Securities and portfolios, calculated from current market data | [asset-analysis](skills/finance/asset-analysis/SKILL.md), [dividend-calendar](skills/finance/dividend-calendar/SKILL.md) |
+| [workflow](skills/workflow/README.md) | Long working sessions with an agent, kept safe across a context compaction | [prepare-for-compaction](skills/workflow/prepare-for-compaction/SKILL.md) |
 
 Some skills only give a useful answer when the agent can reach the right MCP
 server. The category's README says which one and how to connect it.
