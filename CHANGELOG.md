@@ -11,6 +11,11 @@ The newest version below is the one the next release must carry. Every
 
 ### Added
 
+- A new category `workflow` with the skill `prepare-for-compaction`. It moves
+  what only the conversation holds into the agent's memory before a context
+  compaction, tidies what the new state replaces and changes no file of the
+  project. Claude Code installs it as
+  the bundle `workflow` or as a plugin of its own.
 - The README opens with the badge rows of the organisation: CI, coverage and
   licence, the latest release, and the sponsor links. CI writes the coverage
   badge on every push to `main`, to the branch `badges`.
