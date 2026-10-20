@@ -16,6 +16,11 @@ The newest version below is the one the next release must carry. Every
   compaction, tidies what the new state replaces and changes no file of the
   project. Claude Code installs it as the bundle `workflow` or as a plugin of
   its own.
+- A new category `development` with the subcategory `git` and the skill
+  `commit`. It commits in small steps, each passing the project's own checks,
+  on the branch the change belongs to, for any language. Push, pull request
+  and merge wait for the user's word. Claude Code installs it as the bundle
+  `development`, the bundle `development-git` or a plugin of its own.
 - A category can order its skills into subcategories. Each subcategory has a
   README and a bundle `<category>-<subcategory>` in Claude Code, and
   `skills.json` names the subcategory of every skill.

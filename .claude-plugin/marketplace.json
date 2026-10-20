@@ -8,6 +8,23 @@
   },
   "plugins": [
     {
+      "name": "commit",
+      "description": "Commits changes in a git repository in small, checked steps on the right branch, for any language or toolchain. Finds the project's own checks (format, lint, types, tests, lock files) and runs them before every commit, decides whether a change belongs on the current branch or on a new one, keeps secrets and ignored files out, and writes the message from the actual diff. Pushing, pull requests and merging wait for the user's word. Use this skill whenever the user asks to commit, to save the work in git, to split work into commits or to put a change on a branch, and whenever the project's rules say to commit after each step. Answers in the user's language.",
+      "version": "0.2.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.2.0"
+      },
+      "strict": false,
+      "category": "development",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/development/git/commit"
+      ]
+    },
+    {
       "name": "asset-analysis",
       "description": "Writes a structured analysis of a single security from current price, fundamental and news data, with an assessment for the short, medium and long term. Use this skill whenever an ISIN, a ticker or a security's name comes up, or when someone asks about a stock, an ETF, a cryptocurrency, a price target, quarterly figures, analyst opinions, a valuation or a comparison of several securities, also when they only ask in passing what is going on with a title and the word analysis never falls. Not for a dividend calendar or a portfolio's distributions per month. Answers in the user's language.",
       "version": "0.2.0",
@@ -56,6 +73,40 @@
       "repository": "https://github.com/benethos-hub/agent-skills",
       "skills": [
         "./skills/workflow/prepare-for-compaction"
+      ]
+    },
+    {
+      "name": "development",
+      "description": "Every development skill in one plugin. Skills for working in a repository with an agent, in any language. They follow the project's own rules and checks, and they leave pushing, merging and releasing to you.",
+      "version": "0.2.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.2.0"
+      },
+      "strict": false,
+      "category": "development",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/development/git/commit"
+      ]
+    },
+    {
+      "name": "development-git",
+      "description": "Every git skill of development in one plugin. Skills for git in any project: commits in small, checked steps on the branch a change belongs to. Pushing, merging and releasing stay with you.",
+      "version": "0.2.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.2.0"
+      },
+      "strict": false,
+      "category": "development",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/development/git/commit"
       ]
     },
     {
