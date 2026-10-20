@@ -15,8 +15,9 @@ name: Release
 # newest heading in CHANGELOG.md, and its section becomes the release notes:
 #   gh release create vX.Y.Z --target main \
 #     --notes "$(uv run .github/scripts/skills.py version --notes)"
-# Nothing is uploaded unless CI passed on the release commit on main and the
-# tag is the version in the changelog.
+# Nothing is uploaded unless CI passed on the release commit on main, the
+# locked packages have no known vulnerability and the tag is the version in
+# the changelog.
 
 on:
   release:
@@ -28,11 +29,15 @@ permissions:
 jobs:
   # The organisation's gate: the push of the release commit to main ran
   # ci.yml, and that run succeeded. It waits while the run is still going.
+  # The audit checks uv.lock again, for a vulnerability that became known
+  # between the merge and the release.
   ci-passed:
     uses: benethos-hub/.github/.github/workflows/python-release-ci-passed.yml@main
     permissions:
       actions: read
       contents: read
+    with:
+      audit: true
 
   attach:
     name: Attach the skill archives

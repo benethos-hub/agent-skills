@@ -162,8 +162,9 @@ release takes five steps:
    ```
 
 The release workflow then checks, through the organisation's gate, that CI
-passed on the release commit on `main`, and that the tag is the version in
-the changelog. Only then does it attach two files per skill with the same
+passed on the release commit on `main` and that no package in `uv.lock` has
+a known vulnerability. It also checks that the tag is the version in the
+changelog. Only then does it attach two files per skill with the same
 bytes. `<skill-name>.zip` carries no version and gives the stable link to the
 newest release. `<skill-name>-X.Y.Z.zip` shows on disk which version it is.
 Next to them goes `skills.json`, an index with each skill's name, category,
