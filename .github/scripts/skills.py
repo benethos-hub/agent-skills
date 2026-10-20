@@ -257,7 +257,8 @@ def pack(out_dir: Path, version: str | None) -> None:
 
 
 def category_summary(category: str) -> str:
-    """The first paragraph of the category's README, below its title."""
+    """The first paragraph of the category's README, below its title and its
+    badge rows."""
     readme = ROOT / "skills" / category / "README.md"
     if not readme.is_file():
         sys.exit(f"skills/{category}/README.md is missing.")
@@ -265,6 +266,8 @@ def category_summary(category: str) -> str:
     for line in readme.read_text(encoding="utf-8").splitlines()[1:]:
         if line.strip():
             paragraph.append(line.strip())
+        elif paragraph and all(part.startswith("[![") for part in paragraph):
+            paragraph = []
         elif paragraph:
             break
     return " ".join(paragraph)
