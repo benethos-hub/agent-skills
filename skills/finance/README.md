@@ -21,7 +21,8 @@ legal advice.
   - [1. Install the skills](#1-install-the-skills)
   - [2. Connect a market-data server](#2-connect-a-market-data-server)
   - [3. Web search](#3-web-search)
-  - [4. Check the setup](#4-check-the-setup)
+  - [4. Code execution](#4-code-execution)
+  - [5. Check the setup](#5-check-the-setup)
 - [Data the skills use](#data-the-skills-use)
 - [Limits of the data](#limits-of-the-data)
 - [Privacy](#privacy)
@@ -32,7 +33,7 @@ legal advice.
 | Skill | What for | Needs |
 |---|---|---|
 | [asset-analysis](asset-analysis/SKILL.md) | An analysis of a single security with own calculations, data traps checked, an assessment by horizon and no recommendation | a market-data MCP server, a web search helps |
-| [dividend-calendar](dividend-calendar/SKILL.md) | A dividend calendar for a portfolio, current or coming year, paid and forecast kept apart, with a list of gaps | a market-data MCP server |
+| [dividend-calendar](dividend-calendar/SKILL.md) | A dividend calendar for a portfolio, current or coming year, paid and forecast kept apart, with a list of gaps | a market-data MCP server, code execution helps |
 
 A skill brings the method, not the data. The finance skills need prices,
 dividend histories, corporate calendars, financial statements and analyst
@@ -61,7 +62,7 @@ claude plugin marketplace add benethos-hub/agent-skills
 claude plugin install finance@benethos-agent-skills
 ```
 
-Then check the setup as in [step 4](#4-check-the-setup). The sections below
+Then check the setup as in [step 5](#5-check-the-setup). The sections below
 explain each part and the other ways.
 
 ## Setup in detail
@@ -176,7 +177,15 @@ data provider often lag behind, and a price jump needs a named trigger. Without
 a web search the skill still works and says in the answer that the search is
 missing. `dividend-calendar` does not use a web search.
 
-### 4. Check the setup
+### 4. Code execution
+
+`dividend-calendar` brings a script that calculates the calendar by its fixed
+rules. It needs Python 3.11 or newer and nothing else. Claude in the browser
+and Claude Desktop run it with code execution turned on, Claude Code with the
+Python on your computer. Without code execution the agent calculates by the
+same rules itself, which is more prone to error with many positions.
+
+### 5. Check the setup
 
 Start a new chat and ask for the current price of a ticker you know. If the
 agent calls a tool of the server and names a price, the server is connected.
@@ -221,8 +230,9 @@ Each skill has an appendix on the data traps it checks for.
 ## Privacy
 
 A portfolio's share counts stay in the conversation. No data tool takes them.
-Only symbols and ISINs are queried. The server places no orders, holds no
-portfolio and signs in nowhere.
+Only symbols and ISINs are queried. The calculation script of
+`dividend-calendar` runs where the agent runs and sends nothing. The server
+places no orders, holds no portfolio and signs in nowhere.
 
 ## Disclaimer
 

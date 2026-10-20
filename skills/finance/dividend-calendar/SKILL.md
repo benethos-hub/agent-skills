@@ -61,6 +61,17 @@ Put all calls into one parallel block. On a rate limit, wait briefly and repeat 
 
 Every rule here is fixed. Deviations only on explicit request, and then reported separately as a scenario (see below).
 
+**With the script.** The skill brings `scripts/dividend_calendar.py`, which applies every rule of this step. Whenever code can run, calculate with it and not by hand. Write the fetched data into one JSON file and run `python3 scripts/dividend_calendar.py <file>` from the skill's folder, or `python` or `uv run` instead of `python3`. The top of the script describes the input:
+
+- the ex-dates and amounts per share exactly as the dividend history reports them
+- the ex-date and pay date of the corporate calendar, if there is one
+- the currency of the distributions as the data source names it, GBp included
+- each rate as the data source gives it, units of the currency per one unit of the base currency
+
+The script answers with JSON: the months per position, the totals, every payment with its status and the list of gaps. Take its numbers unchanged, without rounding or adding them again. Every entry under `gaps` becomes a line in the list of gaps. The script runs where the agent runs and sends nothing anywhere.
+
+Without code execution, calculate by hand by the rules below. The script follows the same rules.
+
 **Pay date.** The dividend history is dated by the ex-date, the pay date is not in it. If the corporate calendar gives the ex-date and the pay date of the same payment and they are 0 to 70 days apart, that gap applies to every payment of the position. Otherwise 14 days apply, and the pay date is marked as estimated. The pay date is the ex-date plus the gap. It decides which month a payment falls in.
 
 **Reference period.** The basis is the payments whose pay date lies within the 365 days before today. If a pay date has moved forward, the reference period can hold the same calendar month twice, once from last year and once from this year. Then only the payments of the later year count for that month. Otherwise one payment enters the forecast twice.
@@ -167,11 +178,11 @@ The corporate calendar often still shows the last ex-date until the next one is 
 
 ## 4. Pence instead of pounds
 
-London listings often trade in pence (GBp), not pounds (GBP), and their dividends come in pence as well. Divide an amount in GBp by 100 before converting.
+London listings often trade in pence (GBp), not pounds (GBP), and their dividends come in pence as well. Divide an amount in GBp by 100 before converting. The script does that itself.
 
 ## 5. Direction of exchange rates
 
-`EURUSD=X` gives how many US dollars one euro costs. A dollar amount is therefore divided by this rate, not multiplied. The same holds for `EURGBP=X`, `EURCHF=X` and the others.
+`EURUSD=X` gives how many US dollars one euro costs. A dollar amount is therefore divided by this rate, not multiplied. The same holds for `EURGBP=X`, `EURCHF=X` and the others. The script expects the rates in exactly this form.
 
 ## 6. Splits
 
@@ -184,7 +195,8 @@ In the current year, what was paid is also calculated with today's share count. 
 ## 8. Quick check before sending
 
 1. **Every position resolved?** Through the search, not from memory.
-2. **Every pay date explained?** Known gap or marked as estimated.
-3. **No currencies mixed?** Every total in one currency, every rate named.
-4. **List of gaps complete?** Estimated pay dates, missing data, special dividends, missing share counts.
-5. **Answer in the user's language?** Headings, columns and number format included.
+2. **Calculated by the script?** Whenever code can run, and its numbers taken over unchanged.
+3. **Every pay date explained?** Known gap or marked as estimated.
+4. **No currencies mixed?** Every total in one currency, every rate named.
+5. **List of gaps complete?** Estimated pay dates, missing data, special dividends, missing share counts.
+6. **Answer in the user's language?** Headings, columns and number format included.

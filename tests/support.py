@@ -12,10 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ROOT / "skills"
 
 
-def load_skills_module():
-    """Import .github/scripts/skills.py, which is not on the import path."""
-    path = ROOT / ".github" / "scripts" / "skills.py"
-    spec = importlib.util.spec_from_file_location("skills", path)
+def load_module(path: Path):
+    """Import a script that is not on the import path."""
+    spec = importlib.util.spec_from_file_location(path.stem, path)
     module = importlib.util.module_from_spec(spec)
     # dataclass looks the module up in sys.modules while it runs.
     sys.modules[spec.name] = module
@@ -23,7 +22,7 @@ def load_skills_module():
     return module
 
 
-skills = load_skills_module()
+skills = load_module(ROOT / ".github" / "scripts" / "skills.py")
 
 
 def categories() -> list[Path]:

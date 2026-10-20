@@ -9,6 +9,14 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+### Added
+
+- `dividend-calendar` brings a script that calculates the calendar by the
+  skill's fixed rules. The agent passes the fetched data as JSON and takes the
+  numbers over unchanged, instead of calculating by hand or writing code of
+  its own each time. Without code execution the agent still calculates by the
+  rules in the skill. The script needs Python 3.11 or newer and nothing else.
+
 ### Changed
 
 - The release runs the dependency audit of `uv.lock` once more before it
