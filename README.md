@@ -166,8 +166,8 @@ the changelog. Only then does it attach two files per skill with the same
 bytes. `<skill-name>.zip` carries no version and gives the stable link to the
 newest release. `<skill-name>-X.Y.Z.zip` shows on disk which version it is.
 Next to them goes `skills.json`, an index with each skill's name, category,
-description, links, size and SHA-256. GitHub keeps the files of every release
-under its tag, so a fixed version stays reachable:
+subcategory, description, links, size and SHA-256. GitHub keeps the files of
+every release under its tag, so a fixed version stays reachable:
 
 ```
 https://github.com/benethos-hub/agent-skills/releases/download/vX.Y.Z/<skill-name>-X.Y.Z.zip
