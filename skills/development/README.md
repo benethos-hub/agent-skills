@@ -29,6 +29,7 @@ own README with its skills and how to use them.
 |---|---|---|
 | [git](git/README.md) | Commits in small, checked steps on the right branch | [commit](git/commit/SKILL.md) |
 | [review](review/README.md) | A checked review written as work packages, and building it branch by branch | [review](review/review/SKILL.md), [work-through-review](review/work-through-review/SKILL.md) |
+| [maintenance](maintenance/README.md) | Packages, images, CI actions and the runtime kept current, each bump measured and checked | [refresh-dependencies](maintenance/refresh-dependencies/SKILL.md) |
 
 ## Installing
 

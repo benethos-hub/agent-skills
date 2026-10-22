@@ -40,7 +40,7 @@ its own README with its skills, what they need and how to set it up.
 
 | Category | What for | Skills |
 |---|---|---|
-| [development](skills/development/README.md) | Work in a repository, in any language: checked commits on the right branch, a review written as work packages and building it | [commit](skills/development/git/commit/SKILL.md), [review](skills/development/review/review/SKILL.md), [work-through-review](skills/development/review/work-through-review/SKILL.md) |
+| [development](skills/development/README.md) | Work in a repository, in any language: checked commits on the right branch, a review written as work packages and building it, dependencies kept current | [commit](skills/development/git/commit/SKILL.md), [review](skills/development/review/review/SKILL.md), [work-through-review](skills/development/review/work-through-review/SKILL.md), [refresh-dependencies](skills/development/maintenance/refresh-dependencies/SKILL.md) |
 | [finance](skills/finance/README.md) | Securities and portfolios, calculated from current market data | [asset-analysis](skills/finance/asset-analysis/SKILL.md), [dividend-calendar](skills/finance/dividend-calendar/SKILL.md) |
 | [workflow](skills/workflow/README.md) | Long working sessions with an agent, kept safe across a context compaction | [prepare-for-compaction](skills/workflow/prepare-for-compaction/SKILL.md) |
 

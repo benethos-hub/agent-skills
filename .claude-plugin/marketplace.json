@@ -25,6 +25,23 @@
       ]
     },
     {
+      "name": "refresh-dependencies",
+      "description": "Refreshes everything a project pins, in any language: the packages in lock files and manifests, the container images in Dockerfiles and compose files, the actions and images of CI, the language runtime and the tools around it. Measures each newest version at its source instead of waiting for a dependency bot, leaves alone whatever the project's rules or the agent's memory exclude, asks about majors and migrations up front and checks every bump in the way its kind needs before it commits. Pushing, pull requests and merging wait for the user's word. Use this skill whenever the user asks for a dependency update, a deps refresh, an upgrade of packages, images, actions or the runtime, or wants to know what is outdated. Answers in the user's language.",
+      "version": "0.3.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.3.0"
+      },
+      "strict": false,
+      "category": "development",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/development/maintenance/refresh-dependencies"
+      ]
+    },
+    {
       "name": "review",
       "description": "Reviews a codebase or a range of changes for bugs, security, refactoring on code level and refactoring on folder, architecture and design level, in any language. Checks every finding in the code before listing it and writes one file of work packages, one package per branch in a sensible order, each finding with its place, evidence, change and test. The file is written for a less capable model or a fresh session to work through without asking back, so the user's decisions are settled first and written in. Changes nothing in the project. Use this skill whenever the user asks for a review, an audit, a security check, a bug hunt or a refactoring check, or for a list of changes or a to-do list that another model or session should work through. Answers in the user's language.",
       "version": "0.3.0",
@@ -124,6 +141,7 @@
       "repository": "https://github.com/benethos-hub/agent-skills",
       "skills": [
         "./skills/development/git/commit",
+        "./skills/development/maintenance/refresh-dependencies",
         "./skills/development/review/review",
         "./skills/development/review/work-through-review"
       ]
@@ -143,6 +161,23 @@
       "repository": "https://github.com/benethos-hub/agent-skills",
       "skills": [
         "./skills/development/git/commit"
+      ]
+    },
+    {
+      "name": "development-maintenance",
+      "description": "Every maintenance skill of development in one plugin. Skills for keeping a project current in any language: packages, container images, CI actions and the runtime, each measured at its source and checked. What you excluded stays as it is, and pushing, merging and releasing stay with you.",
+      "version": "0.3.0",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/benethos-hub/agent-skills.git",
+        "ref": "v0.3.0"
+      },
+      "strict": false,
+      "category": "development",
+      "license": "MIT",
+      "repository": "https://github.com/benethos-hub/agent-skills",
+      "skills": [
+        "./skills/development/maintenance/refresh-dependencies"
       ]
     },
     {
