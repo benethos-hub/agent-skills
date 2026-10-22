@@ -11,6 +11,13 @@ The newest version below is the one the next release must carry. Every
 
 ### Added
 
+- The subcategory `development/maintenance` with the skill
+  `refresh-dependencies` and the bundle `development-maintenance`. The skill
+  refreshes everything a project pins, in any language: packages, base and
+  runtime images, CI actions, the runtime and its tools. It measures each
+  newest version at its source, leaves alone what the project's rules or the
+  agent's memory exclude, asks about majors and migrations first and checks
+  every bump before it commits.
 - `dividend-calendar` brings a script that calculates the calendar by the
   skill's fixed rules. The agent passes the fetched data as JSON and takes the
   numbers over unchanged, instead of calculating by hand or writing code of
