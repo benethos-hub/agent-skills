@@ -9,6 +9,11 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-22
+
+Two new development subcategories with three skills, a calculation script
+for the dividend calendar, and the dependency audit in the release.
+
 ### Added
 
 - The subcategory `development/maintenance` with the skill
