@@ -10,11 +10,11 @@
     {
       "name": "commit",
       "description": "Commits changes in a git repository in small, checked steps on the right branch, for any language or toolchain. Finds the project's own checks (format, lint, types, tests, lock files) and runs them before every commit, decides whether a change belongs on the current branch or on a new one, keeps secrets and ignored files out, and writes the message from the actual diff. Pushing, pull requests and merging wait for the user's word. Use this skill whenever the user asks to commit, to save the work in git, to split work into commits or to put a change on a branch, and whenever the project's rules say to commit after each step. Answers in the user's language.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "development",
@@ -27,11 +27,11 @@
     {
       "name": "refresh-dependencies",
       "description": "Refreshes everything a project pins, in any language: the packages in lock files and manifests, the container images in Dockerfiles and compose files, the actions and images of CI, the language runtime and the tools around it. Measures each newest version at its source instead of waiting for a dependency bot, leaves alone whatever the project's rules or the agent's memory exclude, asks about majors and migrations up front and checks every bump in the way its kind needs before it commits. Pushing, pull requests and merging wait for the user's word. Use this skill whenever the user asks for a dependency update, a deps refresh, an upgrade of packages, images, actions or the runtime, or wants to know what is outdated. Answers in the user's language.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "development",
@@ -44,11 +44,11 @@
     {
       "name": "review",
       "description": "Reviews a codebase or a range of changes for bugs, security, refactoring on code level and refactoring on folder, architecture and design level, in any language. Checks every finding in the code before listing it and writes one file of work packages, one package per branch in a sensible order, each finding with its place, evidence, change and test. The file is written for a less capable model or a fresh session to work through without asking back, so the user's decisions are settled first and written in. Changes nothing in the project. Use this skill whenever the user asks for a review, an audit, a security check, a bug hunt or a refactoring check, or for a list of changes or a to-do list that another model or session should work through. Answers in the user's language.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "development",
@@ -61,11 +61,11 @@
     {
       "name": "work-through-review",
       "description": "Works through a review file of work packages, as the skill review writes it, one branch per package and one commit per finding, in any language. Checks every finding against the current code first, asks all open questions at the start and then works without stopping, skips a finding that turns out wrong and says why, runs the project's checks before each commit and marks each finding done in the file. Builds nothing beyond the list. Pushing, pull requests and merging wait for the user's word unless the user granted them for this list, and a release is never part of it. Use this skill whenever the user hands over a review list, a to-do list of findings or work packages from another session or model, or asks to work through, apply or implement review findings. Answers in the user's language.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "development",
@@ -78,11 +78,11 @@
     {
       "name": "asset-analysis",
       "description": "Writes a structured analysis of a single security from current price, fundamental and news data, with an assessment for the short, medium and long term. Use this skill whenever an ISIN, a ticker or a security's name comes up, or when someone asks about a stock, an ETF, a cryptocurrency, a price target, quarterly figures, analyst opinions, a valuation or a comparison of several securities, also when they only ask in passing what is going on with a security, even when the word analysis is never used. Not for a dividend calendar or a portfolio's distributions per month. Answers in the user's language.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "finance",
@@ -95,11 +95,11 @@
     {
       "name": "dividend-calendar",
       "description": "Builds a dividend calendar for a portfolio, for the current or a coming year, from each position's dividend history and with fixed, traceable calculation rules. Past months show what was paid, coming months the forecast, and every gap in the data is named. Use this skill whenever someone asks for a dividend calendar, for distributions per month, for a year's dividend income, or when each position pays, also when they only hand over a list of holdings with share counts. Answers in the user's language.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "finance",
@@ -112,11 +112,11 @@
     {
       "name": "prepare-for-compaction",
       "description": "Prepares a working session for a context compaction or a new session. Moves what only the conversation holds into the agent's persistent memory: the user's decisions in their own words, corrections, permissions and how far they reach, traps of the environment and the exact state of the work. Measures every fact before writing it down, refreshes the memories the session touched, tidies what the new state replaces and leaves the project's files alone. Use this skill whenever the user asks to prepare for a compact, a compaction, a context reset or a handover to the next session, also in short forms such as 'prepare compact' or 'auf compact vorbereiten'. Answers in the user's language.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "workflow",
@@ -129,11 +129,11 @@
     {
       "name": "development",
       "description": "Every development skill in one plugin. Skills for working in a repository with an agent, in any language. They follow the project's own rules and checks, and they leave pushing, merging and releasing to you.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "development",
@@ -149,11 +149,11 @@
     {
       "name": "development-git",
       "description": "Every git skill of development in one plugin. Skills for git in any project: commits in small, checked steps on the branch a change belongs to. Pushing, merging and releasing stay with you.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "development",
@@ -166,11 +166,11 @@
     {
       "name": "development-maintenance",
       "description": "Every maintenance skill of development in one plugin. Skills for keeping a project current in any language: packages, container images, CI actions and the runtime, each measured at its source and checked. What you excluded stays as it is, and pushing, merging and releasing stay with you.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "development",
@@ -183,11 +183,11 @@
     {
       "name": "development-review",
       "description": "Every review skill of development in one plugin. Skills for reviewing a project in any language and working the review through: the strongest model checks for bugs, security and refactoring and writes the work packages, another model builds them branch by branch.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "development",
@@ -201,11 +201,11 @@
     {
       "name": "finance",
       "description": "Every finance skill in one plugin, with the MCP server benethos-yahoo-finance-mcp for the data. Skills for securities and portfolios. They calculate from current market data and name every gap in it. They give no recommendation and no investment, tax or legal advice.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "finance",
@@ -227,11 +227,11 @@
     {
       "name": "workflow",
       "description": "Every workflow skill in one plugin. Skills for long working sessions with an agent. They keep decisions, permissions and the state of the work safe across a context compaction and into the next session. They change no file of the project.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "source": {
         "source": "url",
         "url": "https://github.com/benethos-hub/agent-skills.git",
-        "ref": "v0.3.0"
+        "ref": "v0.3.1"
       },
       "strict": false,
       "category": "workflow",
