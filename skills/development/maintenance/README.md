@@ -64,8 +64,9 @@ again.
 
 Before it changes anything, the skill shows the list of what it found and
 asks once about what is yours to decide: a major version, a migration such as
-a new database major, a new runtime line, a wider version range. Patches,
-rebuilt images and minor versions within the ranges it takes on its own.
+a new database major, a new runtime line, a release past an upper bound or
+another wider version range. Patches, rebuilt images and minor versions within
+the ranges it takes on its own.
 
 Each kind of pin gets its own commit and the check it needs: release notes for
 every minor or major, the project's checks and a smoke test before and after

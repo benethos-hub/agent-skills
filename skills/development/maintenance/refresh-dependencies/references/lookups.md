@@ -30,6 +30,18 @@ Commands that show what is newer, without changing anything. Run them through th
 
 A refresh within the ranges changes only the lock file. A raise of a range changes the manifest and reaches everyone who installs the project, so it is a question for the user (step 4).
 
+A dry run of the refresh stays inside the upper bounds and says nothing about a release past one. These listings ignore the bounds:
+
+| Ecosystem | Newest release, whatever the bound |
+|---|---|
+| Python, uv | `uv tree --outdated`, with `--depth 1` for the direct dependencies only |
+| Python, any | `pip index versions <package>` |
+| Node, npm | the column "Latest" of `npm outdated`. "Wanted" stays inside the range |
+| Rust | `cargo outdated`, a plugin |
+| others | the registry of the ecosystem |
+
+Some bounds are not written as one. A plain `1.8` in `Cargo.toml` means `^1.8`, so `<2`. An exact `==1.8` or a `1.8.0` in a manifest bounds as well.
+
 Lock files can also sit next to scripts, actions or tools, not only at the root. Search for them by name.
 
 A platform that installs its own packages, such as the plugin manager of a content system, keeps its versions outside the repository. List them, but update them through the platform and only where the project says so.

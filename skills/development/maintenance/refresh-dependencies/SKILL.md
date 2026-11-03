@@ -61,6 +61,7 @@ Note for each pin how it is pinned: a range, an exact version, a tag, a tag with
 Ask each source, never memory. The reference has the commands.
 
 - **Packages:** the package manager's dry run or outdated listing. It shows direct and transitive moves within the ranges.
+- **Upper bounds:** for every requirement with an upper bound, such as `<2`, `~=1.8`, `^1.8` or an exact `==1.8`, the newest release on the index, whatever the bound. A lock refresh stays inside the bounds, so it never shows a release past one. Use a listing that ignores them, as the reference names.
 - **Images:** the tag list of the registry, and the digest the pinned tag points to now. Both count. A newer tag is an update, and a new digest under the same tag is a rebuild, usually with security fixes of the base system. Pin the digest of the multi-platform index, not of one platform.
 - **Actions:** the newest release of each, and the commit its tag points to. Check whether the major tag still moves. Some projects stopped publishing moving major tags, and a reference like `@v7` then stays on an old version without any sign.
 - **Runtime:** the newest patch of the current line and whether a new minor line is out.
@@ -70,14 +71,20 @@ Mark a release younger than three days as such. Many projects hold those back as
 
 ### Step 4: List, then ask once
 
-Write the list of everything found, one row per pin: kind, place, current version, newest version, type of jump (rebuild, patch, minor, major) and state (take, excluded with source, question).
+Write the list of everything found, one row per pin: kind, place, current version, newest version, type of jump (rebuild, patch, minor, major) and state (take, excluded with source, question, past bound).
+
+A release past an upper bound gets its own row with the state "past bound". The bound decides how it goes on:
+
+- **Set by the project:** a question, like a major. Name the bound, the newest version and its release notes, and recommend whether to raise it.
+- **Held on purpose,** by a rule or the agent's memory from step 1: excluded with its source, like any other exclusion. It is not asked again without a new reason.
+- **Set by a dependency:** the project cannot raise it. The row names the dependency that holds it, and the report says so. There is nothing to ask.
 
 Then ask the user everything that is theirs to decide, in one round, each with a recommendation:
 
 - a major version, which may break the interface
 - a migration rather than an update, such as a new major of a database whose data format changes
 - a new minor line of the runtime, which touches the matrix, the classifiers and the documentation
-- a raise of a version range, which reaches everyone who installs the project
+- a release past an upper bound, and any other raise of a version range, which reaches everyone who installs the project
 - an exclusion that is unclear or seems outdated
 
 Patches, rebuilds and minor versions within the ranges are taken without asking, unless a rule says otherwise. After the answers, work through without further check-ins.
@@ -98,6 +105,8 @@ Work on one branch from an up-to-date main, unless the project commits elsewhere
 6. the tools and other pins
 
 A version string that appears in several places moves in all of them in the same commit. Search the repository for the old string afterwards. Use the pin style of the project. Do not pin what the project leaves floating on purpose, and do not loosen what it pins.
+
+Never raise or remove an upper bound without the user's answer. A refresh that stays inside the bounds is complete without it.
 
 ### Step 7: Check every bump
 
@@ -125,7 +134,7 @@ Report in a short form:
 
 - the bumps taken, as a table with old and new version
 - the exclusions left alone, each with its source
-- what was deferred or asked, and why
+- what was deferred or asked, and why, with every release past an upper bound
 - the checks that ran, and what remains unchecked
 - the branch and its commits
 
@@ -136,6 +145,7 @@ Then stop. Push, pull request and merge wait for the user's word, and a release 
 - It does not touch what the project's rules or the agent's memory exclude.
 - It does not push, open a pull request, merge or release without the user's word.
 - It does not take a major version or a migration without the user's answer.
+- It does not raise or drop an upper bound on its own.
 - It does not switch off a failing check or a warning to get a bump through.
 - It does not remove images, containers or caches it did not create.
 
@@ -175,10 +185,15 @@ A new major of a database changes its data format. That is a migration with its 
 
 A new version of a library made a dependency print deprecation warnings on every call, while every result stayed the same. Compare the error output before and after, not only the results.
 
-## 9. Quick check before reporting
+## 9. A bound that hides a major
+
+A lock refresh respected `idna<3` and reported nothing while 3.20 was out. Only a listing that ignores the bounds showed it. Every upper bound gets checked against the newest release, not against what the refresh moved.
+
+## 10. Quick check before reporting
 
 - Every kind of pin from step 2 was searched.
 - Every newest version was measured at its source.
+- Every upper bound was checked against the newest release on the index.
 - Nothing on the exclusion list changed.
 - Majors, migrations and new runtime lines were asked first.
 - Every bump has its check, and the unchecked rest is named.

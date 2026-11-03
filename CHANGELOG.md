@@ -9,6 +9,14 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+### Changed
+
+- `refresh-dependencies` checks every upper bound against the newest release
+  on the index. A lock refresh stays inside the bounds and never showed a
+  release past one. Such a release is now a row of its own in the list and a
+  question to the user, and the skill never raises or drops a bound on its
+  own.
+
 ## [0.3.1] - 2026-10-22
 
 Two new development subcategories with three skills, a calculation script
