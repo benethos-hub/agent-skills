@@ -9,6 +9,11 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-11-03
+
+Upper bounds in the dependency refresh, the same numbers by hand and by script
+in the dividend calendar, and current upload steps for claude.ai.
+
 ### Changed
 
 - `refresh-dependencies` checks every upper bound against the newest release
