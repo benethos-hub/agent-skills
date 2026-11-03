@@ -55,7 +55,7 @@ The shortest way depends on the client:
 | Client | Shortest way |
 |---|---|
 | Claude Code | Add the marketplace, then install the bundle of a category. Two commands, MCP servers included. |
-| claude.ai and Claude Desktop | Download the skill's ZIP and upload it under Settings, Skills. |
+| claude.ai and Claude Desktop | Download the skill's ZIP and upload it under Customize, Skills. |
 | Other agents | Unpack the skill's ZIP into the agent's skills directory. |
 
 Every release carries each skill as a ZIP of its own. The README of each
@@ -108,9 +108,13 @@ are then set up by hand, as the category's README describes.
 
 1. Download the skill's ZIP. The category's README has a direct link for each
    skill.
-2. Upload it in the settings under Skills. The skill is then available in your
-   account and is used when a task fits.
-3. Connect the MCP server the skill needs, as the category's README
+2. Turn on code execution under Settings, Capabilities. Skills need it. On
+   Team and Enterprise plans an owner turns it on under Organization settings,
+   Plugins & skills.
+3. Open Customize, Skills, choose the plus button, then Create skill and Upload
+   a skill, and select the ZIP. The skill is then available in your account and
+   is used when a task fits.
+4. Connect the MCP server the skill needs, as the category's README
    describes.
 
 ### Other agents
@@ -137,8 +141,8 @@ the newest release again and replace the old one.
 
 This part is for whoever changes the repository. Everything here runs with
 [uv](https://docs.astral.sh/uv/getting-started/installation/). The test tools
-are locked in `uv.lock`, and `.github/scripts/skills.py` needs the standard
-library only.
+are locked in `uv.lock`. `.github/scripts/skills.py` and the scripts of the
+skills need the standard library only.
 
 ### Releases
 
@@ -208,11 +212,12 @@ Locally the same runs with:
 
 ```bash
 uv run pytest                                 # the tests
-uv run ruff check . && uv run ruff format --check . && uv run mypy   # lint
+uv lock --check && uv run ruff check . && uv run ruff format --check . && uv run mypy   # lint
 ```
 
-The newest Python version also measures the coverage of
-`.github/scripts/skills.py`, with a floor of 80 percent. The tests check:
+Mypy covers `.github/scripts/skills.py` and the scripts of the skills. The
+newest Python version also measures the coverage of both, with a floor of 80
+percent. The tests check:
 
 - **Layout.** `skills/` holds only categories, and every `SKILL.md` lies in
   one of them. Every category holds either skill folders or subcategories,
@@ -234,6 +239,8 @@ The newest Python version also measures the coverage of
   `main`.
 - **Command line.** `skills.py` packs, writes and checks the marketplace file
   and names the version as the workflows and this README call it.
+- **Skill scripts.** The calculation script of `dividend-calendar` follows the
+  skill's rules, checked rule by rule, and refuses broken input.
 
 External links are only fetched on request, because that needs the network:
 
@@ -258,6 +265,7 @@ agent-skills/
   .github/
     scripts/skills.py # checks the skills, packs the ZIPs, writes both JSON files
     workflows/        # CI on every push, the release assets on every release
+    dependabot.yml    # weekly proposals for uv.lock and the actions
   tests/              # the checks above, run with uv run pytest
   skills/
     <category>/
@@ -265,7 +273,7 @@ agent-skills/
       <skill-name>/
         SKILL.md      # required: header with name and description, then the instructions
         references/   # optional: longer reference texts the instructions point to
-        scripts/      # optional: helper scripts
+        scripts/      # optional: scripts the instructions run, standard library only
     <category>/       # a category with subcategories instead of skills
       README.md       # its subcategories, what they need, the setup
       <subcategory>/
@@ -295,6 +303,8 @@ agent-skills/
   useful answer.
 - After adding, renaming or changing the header of a skill, regenerate the
   marketplace file with `uv run .github/scripts/skills.py marketplace`.
+- A script under `scripts/` uses the standard library only and has its tests
+  in `tests/`. The skill also says what to do where no code can run.
 - English, no semicolons, no em or en dashes, no emojis. The answer follows the
   user's language.
 - Gaps in the data are named, not covered up. The skill says what it does not

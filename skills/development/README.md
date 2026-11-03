@@ -59,6 +59,9 @@ configuration, a task runner or the project's instruction files, such as
 `AGENTS.md` or `CLAUDE.md`. For pull requests and merges they use the command
 line of the hosting service, for example `gh` for GitHub.
 
+`refresh-dependencies` also reads public registries and release lists over the
+network, and its checks of images need a container runtime.
+
 In claude.ai and Claude Desktop the agent has no access to your repository.
 The skills can then only describe the steps.
 
