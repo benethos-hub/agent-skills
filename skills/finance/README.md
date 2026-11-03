@@ -51,7 +51,7 @@ The shortest way for each client, simplest first:
 | Client | Steps |
 |---|---|
 | Claude Code | Add the marketplace and install the bundle `finance`. It brings both skills and the market-data server. Needs [uv](https://docs.astral.sh/uv/getting-started/installation/). |
-| Claude Desktop | Upload both ZIPs under Settings, Skills. Then open the server's extension `benethos-yahoo-finance-mcp.mcpb`. |
+| Claude Desktop | Upload both ZIPs under Customize, Skills. Then open the server's extension `benethos-yahoo-finance-mcp.mcpb`. |
 | Other agents | Unpack both ZIPs into the agent's skills directory and add the server with `uvx benethos-yahoo-finance-mcp`. |
 | claude.ai in the browser | Upload both ZIPs. The server only works there as your own hosted service. |
 
@@ -133,6 +133,10 @@ The simplest way is the extension. Nothing has to be installed first.
    Settings, Extensions. Confirm the installation.
 3. Start a new chat. The first start of the server takes a few seconds.
 
+On Windows with Smart App Control on, the extension may not start. The
+[server's README](https://github.com/benethos-hub/yahoo-finance-mcp#quick-start-claude-desktop-extension)
+describes the way around it.
+
 Instead of the extension, the server can also be entered by hand. This needs
 [uv](https://docs.astral.sh/uv/getting-started/installation/). Open Settings,
 Developer, Edit Config and add to `claude_desktop_config.json`:
@@ -180,10 +184,13 @@ missing. `dividend-calendar` does not use a web search.
 ### 4. Code execution
 
 `dividend-calendar` brings a script that calculates the calendar by its fixed
-rules. It needs Python 3.11 or newer and nothing else. Claude in the browser
-and Claude Desktop run it with code execution turned on, Claude Code with the
-Python on your computer. Without code execution the agent calculates by the
-same rules itself, which is more prone to error with many positions.
+rules. It needs Python 3.11 or newer and nothing else.
+
+In Claude in the browser and in Claude Desktop, uploaded skills need code
+execution anyway, turned on under Settings, Capabilities. The script runs
+there. Claude Code runs it with the Python on your computer or with uv. An
+agent without code execution calculates by the same rules itself, which is
+more prone to error with many positions.
 
 ### 5. Check the setup
 

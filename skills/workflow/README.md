@@ -39,7 +39,7 @@ The shortest way for each client, simplest first:
 |---|---|
 | Claude Code | Add the marketplace and install the bundle `workflow`. Claude Code brings its own memory. |
 | Other agents | Unpack the ZIP into the agent's skills directory. The agent needs a memory it can write. |
-| claude.ai and Claude Desktop | Upload the ZIP under Settings, Skills. Without a memory the skill writes the handover as a message to keep. |
+| claude.ai and Claude Desktop | Upload the ZIP under Customize, Skills. Without a memory the skill writes the handover as a message to keep. |
 
 For Claude Code these are the two commands:
 

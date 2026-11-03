@@ -16,6 +16,12 @@ The newest version below is the one the next release must carry. Every
   release past one. Such a release is now a row of its own in the list and a
   question to the user, and the skill never raises or drops a bound on its
   own.
+- The rules of `dividend-calendar` name four cases the script already handled:
+  a young fund with a single payment, a position without a payment in the
+  reference period, rounding per payment and the median behind a conspicuous
+  payment. An agent that calculates by hand now arrives at the same numbers.
+- The READMEs name the current way to upload a skill to claude.ai, under
+  Customize, Skills, and that skills need code execution there.
 
 ## [0.3.1] - 2026-10-22
 

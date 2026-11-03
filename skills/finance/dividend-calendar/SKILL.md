@@ -80,17 +80,17 @@ Without code execution, calculate by hand by the rules below. The script follows
 
 **Forecast.** Every payment of the reference period recurs in the same month at the same amount. No growth, no cut, no estimate of one's own.
 
-**Young funds.** If the history goes back less than 360 days, the frequency follows from the median gap between payments: up to 45 days monthly, up to 135 days quarterly, up to 225 days semi-annual, up to 430 days annual. The amount per payment is the average of the payments so far. The months are carried forward in that rhythm from the last payment. Mark the position as extrapolated in the list of gaps.
+**Young funds.** If the history goes back less than 360 days, the frequency follows from the median gap between payments: up to 45 days monthly, up to 135 days quarterly, up to 225 days semi-annual, up to 430 days annual. The amount per payment is the average of the payments so far. The months are carried forward in that rhythm from the last payment. Mark the position as extrapolated in the list of gaps. A single payment has no gap to measure, so the forecast rule above applies to it.
 
 **Paid or forecast.** In the current year, the months before the current month show what was actually paid: the payments with a pay date in that month times today's share count. From the current month on, the forecast applies. A coming year is forecast throughout.
 
-**Currency.** Amount per share times share count in the distribution currency, then converted to the base currency at today's rate. If a rate is missing, the amount stays in its original currency, is marked, and does not enter the base-currency total. Currencies are never added without being converted.
+**Currency.** Amount per share times share count in the distribution currency, then converted to the base currency at today's rate. If a rate is missing, the amount stays in its original currency, is marked, and does not enter the base-currency total. Currencies are never added without being converted. Each payment is rounded to cents, and every total adds up the rounded payments, so the tables add up.
 
 **Gross.** All amounts before taxes. Withholding tax and the user's own taxes on income, in Germany for example Abgeltungsteuer, solidarity surcharge and church tax, are not deducted, not estimated and not offset.
 
-**No distributions.** A position without a payment in its history appears with "no distributions in the data". That can be an accumulating fund, a stock without a dividend or a gap in the data. Do not decide which case it is when the data does not say. Crypto pays nothing.
+**No distributions.** A position without a payment in its history appears with "no distributions in the data". That can be an accumulating fund, a stock without a dividend or a gap in the data. Do not decide which case it is when the data does not say. Crypto pays nothing. A position with payments in its history but none in the reference period gets no forecast and is named in the list of gaps.
 
-**Conspicuous payment.** If a payment in the reference period is one and a half times the other payments of the same position or more, it stays in the calculation. It is named in the list of gaps as a possible special dividend, with the note that it lifts the forecast in case it does not recur.
+**Conspicuous payment.** If a payment in the reference period is one and a half times the median of the other payments of the same position or more, it stays in the calculation. It is named in the list of gaps as a possible special dividend, with the note that it lifts the forecast in case it does not recur.
 
 ### Step 4: Write
 
