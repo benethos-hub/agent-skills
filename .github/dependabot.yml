@@ -2,13 +2,17 @@ version: 2
 updates:
   # The test tools locked in uv.lock: pytest, pytest-cov, Ruff and Mypy. The
   # ecosystem is "uv", not "pip", because uv.lock decides what is installed.
+  # A release the range in pyproject.toml already allows moves only uv.lock. The
+  # range changes only for a release outside it.
   - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    versioning-strategy: increase-if-necessary
     groups:
       minor-and-patch:
+        patterns: ["*"]
         update-types: ["minor", "patch"]
 
   # The workflows pin every action to a full commit SHA, with the version it
@@ -22,4 +26,5 @@ updates:
     open-pull-requests-limit: 5
     groups:
       minor-and-patch:
+        patterns: ["*"]
         update-types: ["minor", "patch"]
