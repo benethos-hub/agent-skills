@@ -12,6 +12,7 @@ updates:
     versioning-strategy: increase-if-necessary
     groups:
       minor-and-patch:
+        patterns: ["*"]
         update-types: ["minor", "patch"]
 
   # The workflows pin every action to a full commit SHA, with the version it
@@ -25,4 +26,5 @@ updates:
     open-pull-requests-limit: 5
     groups:
       minor-and-patch:
+        patterns: ["*"]
         update-types: ["minor", "patch"]
