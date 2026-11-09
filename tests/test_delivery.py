@@ -11,9 +11,9 @@ import re
 import sys
 import tempfile
 import unittest
+import unittest.mock
 import zipfile
 from pathlib import Path
-from unittest import mock
 
 from support import (
     ROOT,
@@ -139,7 +139,7 @@ class PackRulesTest(unittest.TestCase):
     def problems(self, root: Path) -> str:
         stderr = io.StringIO()
         with (
-            mock.patch.object(skills, "ROOT", root),
+            unittest.mock.patch.object(skills, "ROOT", root),
             contextlib.redirect_stderr(stderr),
         ):
             with self.assertRaises(SystemExit):
@@ -188,7 +188,7 @@ class PackRulesTest(unittest.TestCase):
                 "skills/flat/plain/SKILL.md": header("plain", "x"),
             }
         )
-        with mock.patch.object(skills, "ROOT", root):
+        with unittest.mock.patch.object(skills, "ROOT", root):
             found = {s.name: (s.category, s.subcategory) for s in skills.load_skills()}
         self.assertEqual(found, {"commit": ("dev", "git"), "plain": ("flat", None)})
 
@@ -204,7 +204,7 @@ class PackRulesTest(unittest.TestCase):
             }
         )
         out = Path(tempfile.mkdtemp())
-        with mock.patch.object(skills, "ROOT", root):
+        with unittest.mock.patch.object(skills, "ROOT", root):
             pack(out)
         with zipfile.ZipFile(out / "kept.zip") as archive:
             entries = sorted(archive.namelist())
@@ -465,7 +465,7 @@ class CommandLineTest(unittest.TestCase):
     def run_main(self, *args: str) -> str:
         out = io.StringIO()
         with (
-            mock.patch.object(sys, "argv", ["skills.py", *args]),
+            unittest.mock.patch.object(sys, "argv", ["skills.py", *args]),
             contextlib.redirect_stdout(out),
         ):
             skills.main()
@@ -490,7 +490,7 @@ class CommandLineTest(unittest.TestCase):
         # A missing file fails the check, the written one passes it and equals
         # the file in the repository.
         target = Path(tempfile.mkdtemp()) / ".claude-plugin" / "marketplace.json"
-        with mock.patch.object(skills, "MARKETPLACE_FILE", target):
+        with unittest.mock.patch.object(skills, "MARKETPLACE_FILE", target):
             with self.assertRaises(SystemExit):
                 self.run_main("marketplace", "--check")
             self.run_main("marketplace")

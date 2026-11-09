@@ -8,8 +8,8 @@ import json
 import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
-from unittest import mock
 
 from support import SKILLS, load_module
 
@@ -253,7 +253,7 @@ class InputTest(unittest.TestCase):
         path = Path(tempfile.mkdtemp()) / "input.json"
         path.write_text(json.dumps(document), encoding="utf-8")
         out = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")
-        with mock.patch.object(sys, "argv", ["x", str(path)]):
+        with unittest.mock.patch.object(sys, "argv", ["x", str(path)]):
             with contextlib.redirect_stdout(out):
                 calc.main()
         out.seek(0)
@@ -261,8 +261,8 @@ class InputTest(unittest.TestCase):
 
     def test_command_line_exits_on_broken_input(self):
         with (
-            mock.patch.object(sys, "argv", ["x"]),
-            mock.patch.object(sys, "stdin", io.StringIO("{}")),
+            unittest.mock.patch.object(sys, "argv", ["x"]),
+            unittest.mock.patch.object(sys, "stdin", io.StringIO("{}")),
             contextlib.redirect_stderr(io.StringIO()) as err,
         ):
             with self.assertRaises(SystemExit) as stop:
