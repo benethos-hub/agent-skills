@@ -160,7 +160,8 @@ class SkillTest(unittest.TestCase):
             loaded = skills.load_skills()
         except SystemExit as error:
             self.fail(f"skills.py rejects the skills: {error}")
-        self.assertEqual(sorted(s.folder for s in loaded), sorted(self.folders))
+        else:
+            self.assertEqual(sorted(s.folder for s in loaded), sorted(self.folders))
 
     def test_header_fields(self):
         for folder in self.folders:

@@ -8,7 +8,7 @@ import datetime
 import io
 import re
 import unittest
-from unittest import mock
+import unittest.mock
 
 from support import ROOT, markdown_files, rel, skills
 
@@ -75,7 +75,9 @@ class VersionCommandTest(unittest.TestCase):
     def run_version(self, tag=None, notes=False) -> str:
         out = io.StringIO()
         with (
-            mock.patch.object(skills.Path, "read_text", return_value=self.SAMPLE),
+            unittest.mock.patch.object(
+                skills.Path, "read_text", return_value=self.SAMPLE
+            ),
             contextlib.redirect_stdout(out),
         ):
             skills.version(tag, notes)
