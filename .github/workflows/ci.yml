@@ -4,10 +4,10 @@ name: CI
 # release would, so a broken header, a dead link or a stale version number
 # shows on the push and not only when a release is published.
 #
-# lint, test, audit and brand come from benethos-hub/.github and follow its
-# main, so a change to a shared rule reaches every repository at once. The
-# tools of lint and test are locked in uv.lock, their settings live in
-# pyproject.toml.
+# lint, test, audit, brand and codeql come from benethos-hub/.github and
+# follow its main, so a change to a shared rule reaches every repository at
+# once. The tools of lint and test are locked in uv.lock, their settings live
+# in pyproject.toml.
 
 on:
   push:
@@ -46,6 +46,22 @@ jobs:
   # No known vulnerability in any version uv.lock pins.
   audit:
     uses: benethos-hub/.github/.github/workflows/python-dependency-audit.yml@main
+
+  # CodeQL on the Python code and on the workflows themselves, with the
+  # security and the quality queries. GitHub's default setup ran the security
+  # queries alone, and the quality queries are no setting of it. Findings go
+  # to Security, Code scanning, and never fail this job, so codeql / CodeQL is
+  # no required check. codeql.yml makes the same call once a week, for the
+  # queries GitHub adds in between. The job grants security-events: write, the
+  # one permission the upload needs, and the called workflow gets no more
+  # than that.
+  codeql:
+    uses: benethos-hub/.github/.github/workflows/codeql.yml@main
+    permissions:
+      contents: read
+      security-events: write
+    with:
+      languages: python,actions
 
   package:
     name: Check and pack the skills

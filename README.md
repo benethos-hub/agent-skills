@@ -207,7 +207,8 @@ the file no longer matches the skills.
 
 CI runs the shared checks of the organisation on every push and pull
 request, from `benethos-hub/.github`: lint, the tests on Python 3.11 to 3.15,
-an audit of `uv.lock` and the brand check. Next to them it packs every skill.
+an audit of `uv.lock`, the brand check and CodeQL with the security and the
+quality queries. Next to them it packs every skill.
 Locally the same runs with:
 
 ```bash

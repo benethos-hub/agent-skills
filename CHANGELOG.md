@@ -9,6 +9,14 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+### Changed
+
+- CI runs CodeQL through the organisation's workflow, with the security and
+  the quality queries, on every push and pull request and once a week. It
+  replaces GitHub's default setup, which ran the security queries alone.
+  Findings go to Security, Code scanning, and fail no check. The change
+  reaches nobody who installs the skills.
+
 ## [0.3.2] - 2026-11-03
 
 Upper bounds in the dependency refresh, the same numbers by hand and by script
