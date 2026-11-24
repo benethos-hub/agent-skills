@@ -11,6 +11,9 @@ The newest version below is the one the next release must carry. Every
 
 ### Changed
 
+- `prepare-for-compaction` ends its report with a line of its own that says the
+  session can be compacted now. Before, that point stood in the middle of the
+  report, and a note or an offer could follow it.
 - CI runs CodeQL through the organisation's workflow, with the security and
   the quality queries, on every push and pull request and once a week. It
   replaces GitHub's default setup, which ran the security queries alone.

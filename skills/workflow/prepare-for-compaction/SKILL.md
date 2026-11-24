@@ -94,11 +94,10 @@ Keep it short:
 1. Which memories are new and which changed, by name.
 2. Which memories were deleted or merged, each with the reason.
 3. The state in two or three lines: branch, commit, what is open, what waits for the user's word.
-4. That the session can be compacted now.
 
 When the memory as a whole has grown hard to read, say so in one line and offer to tidy it as a task of its own.
 
-No further question at the end. The user starts the compaction.
+The last line of the report says that the session can be compacted now, as a line of its own. Nothing follows it, no note on the project and no offer, so the user sees at a glance that the handover is done. No further question at the end. The user starts the compaction.
 
 ## After the compaction
 
@@ -150,3 +149,4 @@ A memory of how an outside service or library behaves is a hint, not evidence. N
 - Every permission names its item and whether it is used up.
 - Nothing was deleted that is not recorded elsewhere or proven wrong, and the report names every deletion.
 - No file of the project changed. `git status` shows the same as before step 1.
+- The last line of the report says that the session can be compacted now.
