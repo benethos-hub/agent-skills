@@ -9,6 +9,11 @@ The newest version below is the one the next release must carry. Every
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-11-24
+
+A clear last line in the compaction report, and CodeQL with the quality
+queries.
+
 ### Changed
 
 - `prepare-for-compaction` ends its report with a line of its own that says the
