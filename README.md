@@ -265,7 +265,7 @@ agent-skills/
     marketplace.json  # generated, for Claude Code: one plugin per skill, bundle and MCP server
   .github/
     scripts/skills.py # checks the skills, packs the ZIPs, writes both JSON files
-    workflows/        # CI on every push, the release assets on every release
+    workflows/        # CI on every push, CodeQL every week, the release assets
     dependabot.yml    # weekly proposals for uv.lock and the actions
   tests/              # the checks above, run with uv run pytest
   skills/

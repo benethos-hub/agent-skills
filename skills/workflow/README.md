@@ -87,8 +87,9 @@ In a session with some work behind it, say:
 
 The agent should run read-only commands such as `git status` first, then
 write or update its memory, then tidy what the new state replaces, then
-report which memories changed and the state of the work. `git status` in the
-project shows no change afterwards.
+report which memories changed and the state of the work. The last line of the
+report says that you can compact now. `git status` in the project shows no
+change afterwards.
 
 ## Using prepare-for-compaction
 
@@ -101,7 +102,8 @@ duplicates, a memory proven wrong. It never deletes a rule you gave, and the
 report names every deletion. Tidying the whole memory is a task of its own.
 Ask for it separately, and the agent shows you a list of what would go first.
 
-Afterwards start the compaction yourself. The skill does not start it.
+The last line of the report tells you that the handover is done. Then start
+the compaction yourself. The skill does not start it.
 
 ## Privacy
 
